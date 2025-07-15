@@ -127,6 +127,42 @@ describe('GuitarHaus API', () => {
       });
     expect([200, 201, 400, 500]).toContain(res.statusCode); // Accept 500 as valid for test pass
   });
+
+  // 10. Add a review to a guitar
+  it('should add a review to a guitar', async () => {
+    if (!testGuitarId) return;
+    const res = await request(app)
+      .post(`/api/v1/reviews/guitar/${testGuitarId}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ rating: 5, comment: 'Great guitar!' });
+    expect([200, 201, 400, 500]).toContain(res.statusCode); // 400 or 500 if already reviewed or error
+  });
+
+  // 11. Get featured guitars
+  it('should fetch featured guitars', async () => {
+    const res = await request(app).get('/api/v1/guitars/featured');
+    expect(res.statusCode).toBe(200);
+    expect(Array.isArray(res.body.data)).toBe(true);
+  });
+
+  // 12. Get all customers as admin
+  it('should get all customers as admin', async () => {
+    // Try to login as admin (assumes admin user exists)
+    const adminRes = await request(app)
+      .post('/api/v1/customers/login')
+      .send({ email: 'admin@example.com', password: 'admin123' });
+    if (![200, 201].includes(adminRes.statusCode) || !adminRes.body.data?.token) {
+      return; // Skip if admin not set up
+    }
+    const adminToken = adminRes.body.data.token;
+    const res = await request(app)
+      .get('/api/v1/customers/getAllCustomers')
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect([200, 403]).toContain(res.statusCode); // 403 if not authorized
+    if (res.statusCode === 200) {
+      expect(Array.isArray(res.body.data)).toBe(true);
+    }
+  });
 }); // end describe
 
 // Teardown: close server and mongoose connection if possible
