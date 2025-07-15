@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import guitar1 from '/src/assets/images/guitar1.jpg';
+import guitar1 from '/src/assets/images/guitar_homepage.jpg';
 import guitar2 from '/src/assets/images/guitar2.jpg';
 import guitar3 from '/src/assets/images/guitar3.jpg';
 import guitar4 from '/src/assets/images/guitar4.jpg';

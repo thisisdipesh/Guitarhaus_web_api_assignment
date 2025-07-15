@@ -5,7 +5,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import heroImage from "/src/assets/images/guitar1.jpg";
+import heroImage from "/src/assets/images/guitar_homepage.jpg";
 import contactImage from "/src/assets/images/guitar2.jpg";
 import packagesImage from "/src/assets/images/guitar3.jpg";
 
