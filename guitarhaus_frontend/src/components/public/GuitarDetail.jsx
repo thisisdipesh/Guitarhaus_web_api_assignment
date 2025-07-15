@@ -155,7 +155,7 @@ const PackageDetail = () => {
                 onClick={() => navigate(`/checkout/${packageData._id}`)}
                 className="flex-1 bg-yellow-500 text-black px-6 py-3 rounded-lg text-lg font-bold shadow-md hover:bg-yellow-400 transition duration-300 flex items-center justify-center gap-2"
               >
-                <FaGuitar /> Book Now
+                <FaGuitar /> Add to Cart
               </button>
             </div>
           </div>
