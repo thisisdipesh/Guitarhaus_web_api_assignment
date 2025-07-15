@@ -69,11 +69,12 @@ const PackageDetail = () => {
         // Add to wishlist
         const res = await axios.post(
           `http://localhost:3000/api/v1/wishlist/add`,
-          { packageId: id },
+          { guitarId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setIsFavorite(true);
         setWishlistCount(res.data.count); // Update count from response
+        navigate('/favorite');
       }
     } catch (err) {
       console.error("Error updating wishlist", err);
