@@ -6,18 +6,18 @@ const mockGuitar = {
   _id: '1',
   name: 'Fender Stratocaster',
   price: 1200,
-  image: 'guitar1.jpg',
+  images: ['test.jpg'],
 };
 
 describe('GuitarCard', () => {
-  it('renders guitar info and action buttons', () => {
+  it('renders guitar info and view details link', () => {
     render(
       <MemoryRouter>
-        <GuitarCard guitar={mockGuitar} />
+        <GuitarCard guitarData={mockGuitar} />
       </MemoryRouter>
     );
     expect(screen.getByText(/Fender Stratocaster/i)).toBeInTheDocument();
     expect(screen.getByText(/1200/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Add to Cart/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /View Details/i })).toBeInTheDocument();
   });
 }); 

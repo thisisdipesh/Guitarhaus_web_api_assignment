@@ -9,7 +9,8 @@ describe('Guitars Page', () => {
         <Guitars />
       </MemoryRouter>
     );
-    expect(screen.getByText(/Guitars/i)).toBeInTheDocument();
+    // Use getAllByText to avoid multiple match error
+    expect(screen.getAllByText(/Guitars/i).length).toBeGreaterThan(0);
     // Optionally: expect a grid or list
   });
 }); 

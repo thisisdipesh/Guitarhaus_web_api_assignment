@@ -1,3 +1,6 @@
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 import { render, screen } from '@testing-library/react';
 import Home from '../src/components/public/Home';
 import { MemoryRouter } from 'react-router-dom';
@@ -9,7 +12,7 @@ describe('Home Page', () => {
         <Home />
       </MemoryRouter>
     );
-    expect(screen.getByText(/GuitarHaus/i)).toBeInTheDocument();
-    expect(screen.getByText(/Guitars/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/GuitarHaus/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Guitars/i).length).toBeGreaterThan(0);
   });
 }); 
