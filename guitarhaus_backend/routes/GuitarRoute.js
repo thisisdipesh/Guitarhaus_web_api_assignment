@@ -23,7 +23,7 @@ router.get("/:id", getGuitar);
 
 // Admin only routes
 router.post("/", protect, authorize("admin"), upload.single("images"), createGuitar);
-router.put("/:id", protect, authorize("admin"), updateGuitar);
+router.put("/:id", protect, authorize("admin"), upload.single("image"), updateGuitar);
 router.delete("/:id", protect, authorize("admin"), deleteGuitar);
 
 module.exports = router; 

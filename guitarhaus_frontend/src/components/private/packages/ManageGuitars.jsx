@@ -139,8 +139,10 @@ const ManageGuitars = () => {
       // Add image if selected
       if (selectedImage) {
         formData.append('image', selectedImage);
+        console.log('Adding image to form:', selectedImage.name);
       }
 
+      console.log('Sending update request for guitar:', editingGuitar._id);
       const response = await axios.put(
         `http://localhost:3000/api/v1/guitars/${editingGuitar._id}`,
         formData,
@@ -152,10 +154,10 @@ const ManageGuitars = () => {
         }
       );
 
-      // Update the guitar in the local state
-      setGuitars(guitars.map(guitar => 
-        guitar._id === editingGuitar._id ? response.data.data : guitar
-      ));
+      console.log('Update response:', response.data);
+
+      // Refresh the guitars list to get updated data
+      await fetchGuitars();
 
       setMessage("Guitar updated successfully!");
       setShowEditModal(false);
@@ -163,6 +165,7 @@ const ManageGuitars = () => {
       setSelectedImage(null);
       setImagePreview(null);
     } catch (error) {
+      console.error('Error updating guitar:', error);
       setMessage("Error updating guitar. Please try again.");
     }
   };
