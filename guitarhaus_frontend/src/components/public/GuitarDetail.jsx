@@ -95,38 +95,57 @@ const PackageDetail = () => {
     <>
       <Navbar wishlistCount={wishlistCount} />
       
-      {/* Main Guitar Display Section */}
+      {/* Main Guitar Display Section with Side Info */}
       <div className="relative w-full h-[500px] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
-        {/* Guitar Image Display */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Guitar Image */}
+        <div className="absolute inset-0 flex items-center">
+          {/* Guitar Image - Left Side */}
+          <div className="w-1/2 h-full flex items-center justify-center">
             <img
               src={getGuitarImage()}
               alt={packageData.title || "Guitar"}
               className="max-w-full max-h-full object-contain opacity-90"
               style={{ maxHeight: '80%', maxWidth: '80%' }}
             />
-            
-            {/* Overlay with brand and category info */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2">
-              <div className="flex items-center gap-2 text-yellow-400">
-                <FaCrown size={16} />
-                <span className="text-lg font-semibold">{packageData.brand}</span>
+          </div>
+          
+          {/* Guitar Info - Right Side */}
+          <div className="w-1/2 h-full flex flex-col justify-center items-start px-8 text-white">
+            <div className="space-y-6">
+              {/* Guitar Name */}
+              <div>
+                <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg tracking-tight mb-4">
+                  {packageData.title}
+                </h1>
               </div>
-              <div className="flex items-center gap-2 text-yellow-400">
-                <FaStar size={16} />
-                <span className="text-lg font-semibold">{packageData.category}</span>
+              
+              {/* Brand and Category */}
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <FaCrown className="text-yellow-400" size={20} />
+                  <span className="text-xl font-semibold text-yellow-400">{packageData.brand}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <FaStar className="text-yellow-400" size={20} />
+                  <span className="text-xl font-semibold text-yellow-400">{packageData.category}</span>
+                </div>
               </div>
+              
+              {/* Price */}
+              <div className="flex items-center gap-3">
+                <FaTag className="text-yellow-400" size={20} />
+                <span className="text-2xl font-bold text-yellow-400">₹{packageData.price}</span>
+              </div>
+              
+              {/* Add to Cart Button */}
+              <button
+                onClick={() => navigate(`/checkout/${packageData._id}`)}
+                className="bg-yellow-500 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition duration-300 shadow-lg mt-6 flex items-center gap-3"
+              >
+                <FaGuitar size={20} />
+                Add to Cart
+              </button>
             </div>
           </div>
-        </div>
-        
-        {/* Guitar Title Overlay */}
-        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg tracking-tight">
-            {packageData.title}
-          </h1>
         </div>
       </div>
 
@@ -177,13 +196,6 @@ const PackageDetail = () => {
           >
             <FaHeart className={isFavorite ? "text-white" : "text-red-600"} />
             {isFavorite ? "Remove from Wishlist" : "Add to Wishlist"}
-          </button>
-          
-          <button
-            onClick={() => navigate(`/checkout/${packageData._id}`)}
-            className="flex items-center justify-center gap-3 bg-yellow-500 text-black px-8 py-4 rounded-lg text-lg font-bold shadow-lg hover:bg-yellow-400 transition duration-300"
-          >
-            <FaGuitar /> Add to Cart
           </button>
         </div>
 
