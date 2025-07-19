@@ -47,7 +47,7 @@ const Login = () => {
         <Link to="/">
           <img
             src="/src/assets/images/logo.png"
-            alt="Trek Logo"
+            alt="GuitarHaus Logo"
             className="h-12"
           />
         </Link>

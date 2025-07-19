@@ -53,8 +53,6 @@ const Home = () => {
         </div>
       </div>
 
-      <Footer />
-
       {/* Why Choose GuitarHaus Section */}
       <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 py-12 mt-12">
         <h2 className="text-3xl font-bold text-center text-yellow-900 mb-8 flex items-center justify-center gap-2">
@@ -64,7 +62,7 @@ const Home = () => {
           <div className="flex flex-col items-center bg-white rounded-lg shadow-md p-6 w-full md:w-1/4">
             <FaCrown size={40} className="text-yellow-700 mb-2" />
             <h3 className="font-bold text-lg mb-1">Premium Brands</h3>
-            <p className="text-gray-600 text-center">Handpicked guitars from the world’s top makers.</p>
+            <p className="text-gray-600 text-center">Handpicked guitars from the world's top makers.</p>
           </div>
           <div className="flex flex-col items-center bg-white rounded-lg shadow-md p-6 w-full md:w-1/4">
             <FaTools size={40} className="text-yellow-700 mb-2" />
@@ -90,10 +88,13 @@ const Home = () => {
         <div className="relative z-10 max-w-3xl mx-auto text-center text-white">
           <FaGuitar size={50} className="mx-auto mb-4 text-yellow-400 animate-bounce" />
           <h2 className="text-3xl font-bold mb-4">Guitar Stories</h2>
-          <p className="text-xl italic mb-6">“I found my dream guitar at GuitarHaus. The quality, service, and passion for music is unmatched!”</p>
+          <p className="text-xl italic mb-6">"I found my dream guitar at GuitarHaus. The quality, service, and passion for music is unmatched!"</p>
           <span className="block font-semibold">— A. Musician, Touring Artist</span>
         </div>
       </div>
+
+      {/* Footer - Now at the very end */}
+      <Footer />
 
       {/* Scroll to Top Button */}
       {showScroll && (

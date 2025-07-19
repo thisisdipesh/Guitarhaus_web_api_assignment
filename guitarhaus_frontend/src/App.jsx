@@ -1,6 +1,23 @@
 import React, { lazy, Suspense } from "react";
 import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom";
 
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-yellow-700"></div>
+  </div>
+);
+
+// Error fallback component
+const ErrorFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-center">
+      <h1 className="text-2xl font-bold text-red-600 mb-4">Something went wrong</h1>
+      <p className="text-gray-600">Please try refreshing the page</p>
+    </div>
+  </div>
+);
+
 // Lazy Imports
 const Home = lazy(() => import("./components/public/Home"));
 const Login = lazy(() => import("./components/public/Login"));
@@ -29,7 +46,7 @@ const Confirmed = lazy(() => import("./components/private/bookings/Confirmed"));
 const Payments = lazy(() => import("./components/private/payments/Payments"));
 const Users = lazy(() => import("./components/private/users/Users"));
 const Reviews = lazy(() => import("./components/private/reviews/Reviews"));
-const Profile = lazy(() => import("./components/private/profile/profile"));
+const Profile = lazy(() => import("./components/private/profile/Profile"));
 const Settings = lazy(() => import("./components/private/setting/settings"));
 
 function App() {
@@ -40,120 +57,108 @@ function App() {
   const publicRoutes = [
     {
       path: "/",
-      element: <Suspense><Home /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Home /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/login",
-      element: <Suspense><Login /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Login /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/register",
-      element: <Suspense><Register /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Register /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
-   
     {
       path: "/checkout/:id",
-      element: <Suspense><Checkout /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Checkout /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/faq",
-      element: <Suspense><Faq /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Faq /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/terms",
-      element: <Suspense><Terms /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Terms /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/privacy",
-      element: <Suspense><Privacy /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Privacy /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/aboutus",
-      element: <Suspense><Aboutus /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Aboutus /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/contact",
-      element: <Suspense><Contact /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Contact /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/review",
-      element: <Suspense><Review /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Review /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
-   
     {
       path: "/favorite",
-      element: <Suspense><Favorite /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Favorite /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/myprofile",
-      element: <Suspense><Myprofile /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Myprofile /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/mycart",
-      element: <Suspense><Mycart /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Mycart /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/editprofile",
-      element: <Suspense><EditProfile /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><EditProfile /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/guitars",
-      element: <Suspense><Guitars /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><Guitars /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
     {
       path: "/guitars/:id",
-      element: <Suspense><GuitarDetail /></Suspense>,
-      errorElement: <>Error</>,
+      element: <Suspense fallback={<LoadingFallback />}><GuitarDetail /></Suspense>,
+      errorElement: <ErrorFallback />,
     },
-    { path: "*", element: <div>404: Page not found</div> },
+    // Admin routes - accessible only to admins
+    ...(isAdmin ? [
+      {
+        path: "/admin",
+        element: <Suspense fallback={<LoadingFallback />}><Layout /></Suspense>,
+        errorElement: <ErrorFallback />,
+        children: [
+          { path: "dashboard", element: <Suspense fallback={<LoadingFallback />}><Dashboard /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "addguitar", element: <Suspense fallback={<LoadingFallback />}><AddGuitar /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "manageguitars", element: <Suspense fallback={<LoadingFallback />}><ManageGuitars /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "pending", element: <Suspense fallback={<LoadingFallback />}><Pending /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "confirmed", element: <Suspense fallback={<LoadingFallback />}><Confirmed /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "payments", element: <Suspense fallback={<LoadingFallback />}><Payments /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "users", element: <Suspense fallback={<LoadingFallback />}><Users /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "reviews", element: <Suspense fallback={<LoadingFallback />}><Reviews /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "profile", element: <Suspense fallback={<LoadingFallback />}><Profile /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "settings", element: <Suspense fallback={<LoadingFallback />}><Settings /></Suspense>, errorElement: <ErrorFallback /> },
+        ],
+      }
+    ] : []),
+    { path: "*", element: <div className="flex items-center justify-center min-h-screen"><div className="text-center"><h1 className="text-2xl font-bold text-red-600 mb-4">404: Page not found</h1><p className="text-gray-600">The page you're looking for doesn't exist</p></div></div> },
   ];
 
-  const privateRoutes = [
-    {
-      path: "/admin",
-      element: <Suspense><Layout /></Suspense>,
-      errorElement: <>Error</>,
-      children: [
-        { path: "dashboard", element: <Suspense><Dashboard /></Suspense>, errorElement: <>Error</> },
-        { path: "addguitar", element: <Suspense><AddGuitar /></Suspense>, errorElement: <>Error</> },
-        { path: "manageguitars", element: <Suspense><ManageGuitars /></Suspense>, errorElement: <>Error</> },
-        { path: "pending", element: <Suspense><Pending /></Suspense>, errorElement: <>Error</> },
-        { path: "confirmed", element: <Suspense><Confirmed /></Suspense>, errorElement: <>Error</> },
-        { path: "payments", element: <Suspense><Payments /></Suspense>, errorElement: <>Error</> },
-        { path: "users", element: <Suspense><Users /></Suspense>, errorElement: <>Error</> },
-        { path: "reviews", element: <Suspense><Reviews /></Suspense>, errorElement: <>Error</> },
-        { path: "profile", element: <Suspense><Profile /></Suspense>, errorElement: <>Error</> },
-        { path: "settings", element: <Suspense><Settings /></Suspense>, errorElement: <>Error</> },
-      ],
-    },
-    { path: "*", element: <>Page not found</>, errorElement: <>Error</> },
-  ];
-
-  const routes = isAdmin ? privateRoutes : publicRoutes;
-
-  // Redirect to login if user is not authenticated
-  const checkAuth = () => {
-    if (!localStorage.getItem("token")) {
-      return redirect("/login");
-    }
-  };
-
-  return <RouterProvider router={createBrowserRouter(routes)} />;
+  return <RouterProvider router={createBrowserRouter(publicRoutes)} />;
 }
 
 export default App;

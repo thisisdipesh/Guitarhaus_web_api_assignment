@@ -64,7 +64,7 @@ const Sidebar = () => {
           {!isCollapsed && openMenus.guitars && (
             <div className="ml-6 space-y-1 mt-1">
               <Link onClick={AddGuitar} to="/admin/addguitar" className="block p-2 rounded hover:bg-yellow-100 hover:text-yellow-900 transition-colors">Add New</Link>
-              <Link onClick={ManageGuitars} to="/admin/manageguitars" className="block p-2 rounded hover:bg-yellow-100 hover:text-yellow-900 transition-colors">Manage Guitars</Link>
+              <Link onClick={ManageGuitars} to="/admin/manageguitars" className="block p-2 rounded hover:bg-yellow-100 hover:text-yellow-900 transition-colors">Manage Guitars</Link> 
             </div>
           )}
         </div>
