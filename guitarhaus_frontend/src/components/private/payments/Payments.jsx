@@ -4,9 +4,9 @@ import { FaEye, FaTrash } from "react-icons/fa";
 const Payments = () => {
   // Mock Data (Replace with actual API fetch)
   const payments = [
-    { id: 1, user: "John Doe", bookingId: "B001", amount: "$999", paymentDate: "2025-02-17", status: "Completed" },
-    { id: 2, user: "Jane Smith", bookingId: "B002", amount: "$1,299", paymentDate: "2025-02-16", status: "Pending" },
-    { id: 3, user: "Michael Lee", bookingId: "B003", amount: "$899", paymentDate: "2025-02-15", status: "Refunded" },
+    { id: 1, user: "John Doe", bookingId: "B001", amount: "₹999", paymentDate: "2025-02-17", status: "Completed" },
+    { id: 2, user: "Jane Smith", bookingId: "B002", amount: "₹1,299", paymentDate: "2025-02-16", status: "Pending" },
+    { id: 3, user: "Michael Lee", bookingId: "B003", amount: "₹899", paymentDate: "2025-02-15", status: "Refunded" },
   ];
 
   return (

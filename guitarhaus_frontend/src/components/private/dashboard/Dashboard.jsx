@@ -7,7 +7,7 @@ const Dashboard = () => {
     { id: 1, title: "Total Users", value: "1,240", icon: <FaUsers size={28} />, color: "bg-gradient-to-r from-red-500 to-pink-500" },
     { id: 2, title: "Total Guitars", value: "58", icon: <FaGuitar size={28} />, color: "bg-gradient-to-r from-yellow-500 to-yellow-400" },
     { id: 3, title: "Total Bookings", value: "3,450", icon: <FaClipboardList size={28} />, color: "bg-gradient-to-r from-blue-500 to-blue-400" },
-    { id: 4, title: "Total Revenue", value: "$12,480", icon: <FaDollarSign size={28} />, color: "bg-gradient-to-r from-green-500 to-green-400" },
+    { id: 4, title: "Total Revenue", value: "₹12,480", icon: <FaDollarSign size={28} />, color: "bg-gradient-to-r from-green-500 to-green-400" },
   ];
 
   const recentBookings = [

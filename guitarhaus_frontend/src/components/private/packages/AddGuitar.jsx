@@ -91,7 +91,7 @@ const AddPackages = () => {
           <option value="Accessories">Accessories</option>
         </select>
         <input type="text" name="color" value={formData.color} onChange={handleChange} placeholder="Color" className="p-2 border rounded" />
-        <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price" required className="p-2 border rounded" />
+        <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price in ₹" required className="p-2 border rounded" />
         <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" required className="p-2 border rounded" />
         <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" required className="p-2 border rounded col-span-2"></textarea>
         <input type="file" name="image" onChange={handleFileChange} required className="p-2 border rounded col-span-2" />

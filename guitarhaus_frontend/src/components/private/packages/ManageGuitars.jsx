@@ -227,7 +227,7 @@ const ManageGuitars = () => {
                   <td className="border p-2">{guitar.brand}</td>
                   <td className="border p-2">{guitar.category}</td>
                   <td className="border p-2">{guitar.specifications?.color || '-'}</td>
-                  <td className="border p-2">${guitar.price}</td>
+                  <td className="border p-2">₹{guitar.price}</td>
                   <td className="border p-2">{guitar.stock}</td>
                   <td className="border p-2 max-w-xs truncate">{guitar.description}</td>
                   <td className="border p-2">
@@ -393,7 +393,7 @@ const ManageGuitars = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Price ($)
+                    Price (₹)
                   </label>
                   <input
                     type="number"
