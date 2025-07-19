@@ -14,25 +14,43 @@ const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState("");
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:3000/api/v1/customers/getAllCustomers", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers(response.data.data || []);
+    } catch (err) {
+      setError("Failed to fetch users. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/api/v1/customers/getAllCustomers", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUsers(response.data.data || []);
-      } catch (err) {
-        setError("Failed to fetch users. Please try again.");
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchUsers();
   }, []);
+
+  const handleDelete = async (userId, userName) => {
+    if (!window.confirm(`Are you sure you want to delete user '${userName}'? This action cannot be undone.`)) return;
+    setDeleting(userId);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`http://localhost:3000/api/v1/customers/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setUsers((prev) => prev.filter((u) => u._id !== userId));
+    } catch (err) {
+      alert("Failed to delete user. Please try again.");
+    } finally {
+      setDeleting("");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-yellow-100 p-0 md:p-8">
@@ -79,7 +97,7 @@ const Users = () => {
                           {user.status || (user.isActive === false ? "Inactive" : "Active")}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm flex gap-2">
+                      <td className="px-6 py-4 text-sm flex gap-2 flex-wrap">
                         <button
                           className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-4 py-1 rounded-full font-bold shadow hover:from-yellow-500 hover:to-yellow-700 transition-all"
                           onClick={() => alert(`View user details for ${user.fname || user.lname || user.email}`)}
@@ -102,6 +120,13 @@ const Users = () => {
                             Activate
                           </button>
                         )}
+                        <button
+                          className="bg-gradient-to-r from-gray-700 to-red-700 text-white px-4 py-1 rounded-full font-bold shadow hover:from-red-800 hover:to-red-900 transition-all"
+                          disabled={deleting === user._id}
+                          onClick={() => handleDelete(user._id, user.fname || user.lname || user.email)}
+                        >
+                          {deleting === user._id ? "Deleting..." : "Delete"}
+                        </button>
                       </td>
                     </tr>
                   ))}
