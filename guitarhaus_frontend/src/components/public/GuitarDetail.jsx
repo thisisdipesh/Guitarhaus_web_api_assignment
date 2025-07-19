@@ -82,60 +82,48 @@ const PackageDetail = () => {
   if (error) return <p className="text-center text-red-600 py-10">{error}</p>;
   if (!packageData) return null;
 
+  // Get the guitar image from backend or fallback to local images
+  const getGuitarImage = () => {
+    if (packageData.images && packageData.images.length > 0) {
+      return `http://localhost:3000/uploads/${packageData.images[0]}`;
+    }
+    // Fallback to local images if no backend image
+    return guitarImages[Math.floor(Math.random() * guitarImages.length)];
+  };
+
   return (
     <>
       <Navbar wishlistCount={wishlistCount} />
       
       {/* Main Guitar Display Section */}
       <div className="relative w-full h-[500px] bg-gradient-to-br from-gray-900 via-gray-800 to-black overflow-hidden">
-        {/* Guitar Neck Display */}
+        {/* Guitar Image Display */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex space-x-8 items-center">
-            {/* Left Guitar Neck */}
-            <div className="transform -rotate-12 opacity-60">
-              <div className="w-32 h-96 bg-gradient-to-b from-amber-800 to-amber-600 rounded-full relative">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-amber-900 rounded-full"></div>
-                <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-2 h-80 bg-amber-900"></div>
-                <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-32 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-48 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-64 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-80 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-              </div>
-            </div>
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Guitar Image */}
+            <img
+              src={getGuitarImage()}
+              alt={packageData.title || "Guitar"}
+              className="max-w-full max-h-full object-contain opacity-90"
+              style={{ maxHeight: '80%', maxWidth: '80%' }}
+            />
             
-            {/* Center Guitar with Icon */}
-            <div className="relative">
-              <FaGuitar size={80} className="text-yellow-400 mb-4 animate-pulse drop-shadow-lg" />
-              <div className="flex flex-col items-center space-y-2">
-                <div className="flex items-center gap-2 text-yellow-400">
-                  <FaCrown size={16} />
-                  <span className="text-lg font-semibold">{packageData.brand}</span>
-                </div>
-                <div className="flex items-center gap-2 text-yellow-400">
-                  <FaStar size={16} />
-                  <span className="text-lg font-semibold">{packageData.category}</span>
-                </div>
+            {/* Overlay with brand and category info */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center space-y-2">
+              <div className="flex items-center gap-2 text-yellow-400">
+                <FaCrown size={16} />
+                <span className="text-lg font-semibold">{packageData.brand}</span>
               </div>
-            </div>
-            
-            {/* Right Guitar Neck */}
-            <div className="transform rotate-12 opacity-60">
-              <div className="w-32 h-96 bg-gradient-to-b from-amber-800 to-amber-600 rounded-full relative">
-                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-amber-900 rounded-full"></div>
-                <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-2 h-80 bg-amber-900"></div>
-                <div className="absolute top-16 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-32 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-48 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-64 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
-                <div className="absolute top-80 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-amber-700 rounded-full"></div>
+              <div className="flex items-center gap-2 text-yellow-400">
+                <FaStar size={16} />
+                <span className="text-lg font-semibold">{packageData.category}</span>
               </div>
             </div>
           </div>
         </div>
         
         {/* Guitar Title Overlay */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center">
+        <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg tracking-tight">
             {packageData.title}
           </h1>
