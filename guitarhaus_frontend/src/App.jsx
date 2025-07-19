@@ -71,6 +71,11 @@ function App() {
       errorElement: <ErrorFallback />,
     },
     {
+      path: "/checkout",
+      element: <Suspense fallback={<LoadingFallback />}><Checkout /></Suspense>,
+      errorElement: <ErrorFallback />,
+    },
+    {
       path: "/checkout/:id",
       element: <Suspense fallback={<LoadingFallback />}><Checkout /></Suspense>,
       errorElement: <ErrorFallback />,
