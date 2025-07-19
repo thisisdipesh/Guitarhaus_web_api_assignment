@@ -21,7 +21,7 @@ const Users = () => {
       setError("");
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:3000/api/v1/customers", {
+        const response = await axios.get("http://localhost:3000/api/v1/customers/getAllCustomers", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUsers(response.data.data || []);
