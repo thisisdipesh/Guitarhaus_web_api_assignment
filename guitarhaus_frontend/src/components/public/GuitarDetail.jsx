@@ -19,6 +19,7 @@ const PackageDetail = () => {
   const [error, setError] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [addingToCart, setAddingToCart] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -75,6 +76,30 @@ const PackageDetail = () => {
       }
     } catch (err) {
       console.error("Error updating wishlist", err);
+    }
+  };
+
+  const handleAddToCart = async () => {
+    if (!token) {
+      alert("Please log in to add items to cart.");
+      return;
+    }
+
+    setAddingToCart(true);
+    try {
+      await axios.post(
+        `http://localhost:3000/api/v1/cart/add`,
+        { guitarId: id, quantity: 1 },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      alert("Guitar added to cart successfully! 🎸");
+      navigate('/mycart');
+    } catch (err) {
+      console.error("Error adding to cart", err);
+      alert("Failed to add to cart. Please try again.");
+    } finally {
+      setAddingToCart(false);
     }
   };
 
@@ -138,11 +163,12 @@ const PackageDetail = () => {
               
               {/* Add to Cart Button */}
               <button
-                onClick={() => navigate(`/checkout/${packageData._id}`)}
-                className="bg-yellow-500 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition duration-300 shadow-lg mt-6 flex items-center gap-3"
+                onClick={handleAddToCart}
+                disabled={addingToCart}
+                className="bg-yellow-500 text-black px-8 py-4 rounded-lg font-bold text-lg hover:bg-yellow-400 transition duration-300 shadow-lg mt-6 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <FaGuitar size={20} />
-                Add to Cart
+                {addingToCart ? "Adding to Cart..." : "Add to Cart"}
               </button>
             </div>
           </div>
