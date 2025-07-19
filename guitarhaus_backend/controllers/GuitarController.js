@@ -123,6 +123,15 @@ exports.createGuitar = asyncHandler(async (req, res, next) => {
     req.body.images = [];
   }
 
+  // Handle specifications object
+  if (req.body.specifications) {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+    } catch (error) {
+      console.error('Error parsing specifications:', error);
+    }
+  }
+
   // Ensure price and stock are numbers
   if (req.body.price) req.body.price = Number(req.body.price);
   if (req.body.stock) req.body.stock = Number(req.body.stock);
@@ -158,6 +167,15 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
   // Handle uploaded image
   if (req.file) {
     req.body.images = [req.file.filename];
+  }
+
+  // Handle specifications object
+  if (req.body.specifications) {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+    } catch (error) {
+      console.error('Error parsing specifications:', error);
+    }
   }
 
   // Ensure price and stock are numbers

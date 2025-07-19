@@ -9,7 +9,11 @@ const AddPackages = () => {
     description: "",
     price: "",
     stock: "",
-    color: "",
+    specifications: {
+      color: "",
+      material: "",
+      strings: ""
+    },
     image: null,
   });
 
@@ -19,7 +23,19 @@ const AddPackages = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    
+    if (name.startsWith('specifications.')) {
+      const specField = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        specifications: {
+          ...prev.specifications,
+          [specField]: value
+        }
+      }));
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleFileChange = (e) => {
@@ -39,7 +55,7 @@ const AddPackages = () => {
     formDataToSend.append("description", formData.description);
     formDataToSend.append("price", formData.price);
     formDataToSend.append("stock", formData.stock);
-    formDataToSend.append("color", formData.color);
+    formDataToSend.append("specifications", JSON.stringify(formData.specifications));
     formDataToSend.append("images", formData.image);
 
     try {
@@ -62,7 +78,11 @@ const AddPackages = () => {
         description: "",
         price: "",
         stock: "",
-        color: "",
+        specifications: {
+          color: "",
+          material: "",
+          strings: ""
+        },
         image: null,
       });
     } catch (error) {
@@ -90,7 +110,9 @@ const AddPackages = () => {
           <option value="Ukulele">Ukulele</option>
           <option value="Accessories">Accessories</option>
         </select>
-        <input type="text" name="color" value={formData.color} onChange={handleChange} placeholder="Color" className="p-2 border rounded" />
+        <input type="text" name="specifications.color" value={formData.specifications.color} onChange={handleChange} placeholder="Color" className="p-2 border rounded" />
+        <input type="text" name="specifications.material" value={formData.specifications.material} onChange={handleChange} placeholder="Material" className="p-2 border rounded" />
+        <input type="text" name="specifications.strings" value={formData.specifications.strings} onChange={handleChange} placeholder="Strings" className="p-2 border rounded" />
         <input type="number" name="price" value={formData.price} onChange={handleChange} placeholder="Price in ₹" required className="p-2 border rounded" />
         <input type="number" name="stock" value={formData.stock} onChange={handleChange} placeholder="Stock" required className="p-2 border rounded" />
         <textarea name="description" value={formData.description} onChange={handleChange} placeholder="Description" required className="p-2 border rounded col-span-2"></textarea>
