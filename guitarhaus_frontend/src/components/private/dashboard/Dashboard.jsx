@@ -6,11 +6,11 @@ const Dashboard = () => {
   const stats = [
     { id: 1, title: "Total Users", value: "1,240", icon: <FaUsers size={28} />, color: "bg-gradient-to-r from-red-500 to-pink-500" },
     { id: 2, title: "Total Guitars", value: "58", icon: <FaGuitar size={28} />, color: "bg-gradient-to-r from-yellow-500 to-yellow-400" },
-    { id: 3, title: "Total Bookings", value: "3,450", icon: <FaClipboardList size={28} />, color: "bg-gradient-to-r from-blue-500 to-blue-400" },
+    { id: 3, title: "Total Orders", value: "3,450", icon: <FaClipboardList size={28} />, color: "bg-gradient-to-r from-blue-500 to-blue-400" },
     { id: 4, title: "Total Revenue", value: "₹12,480", icon: <FaDollarSign size={28} />, color: "bg-gradient-to-r from-green-500 to-green-400" },
   ];
 
-  const recentBookings = [
+  const recentOrders = [
     { id: 1, customer: "John Doe", guitar: "Fender Stratocaster", date: "2024-08-15", status: "Confirmed" },
     { id: 2, customer: "Jane Smith", guitar: "Gibson Les Paul", date: "2024-08-14", status: "Pending" },
     { id: 3, customer: "Mike Johnson", guitar: "Ibanez RG", date: "2024-08-13", status: "Canceled" },
@@ -74,28 +74,26 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Recent Bookings Table */}
-      <div className="bg-white shadow-lg rounded-2xl p-8 mt-8">
-        <h3 className="text-2xl font-bold mb-6 text-gray-800">Recent Bookings</h3>
+      {/* Recent Orders Table */}
+      <div className="bg-white rounded-2xl shadow-lg p-8 mt-8">
+        <h3 className="text-2xl font-bold mb-6 text-gray-800">Recent Orders</h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-left rounded-xl">
+          <table className="min-w-full bg-white">
             <thead>
-              <tr className="border-b text-gray-600">
-                <th className="py-3 px-4 text-sm font-semibold">CUSTOMER</th>
-                <th className="py-3 px-4 text-sm font-semibold">GUITAR</th>
-                <th className="py-3 px-4 text-sm font-semibold">DATE</th>
-                <th className="py-3 px-4 text-sm font-semibold">STATUS</th>
+              <tr>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Customer</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Guitar</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Date</th>
+                <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700">Status</th>
               </tr>
             </thead>
             <tbody>
-              {recentBookings.map((booking) => (
-                <tr key={booking.id} className="border-b hover:bg-gray-50">
-                  <td className="py-3 px-4 text-sm font-semibold text-gray-800">{booking.customer}</td>
-                  <td className="py-3 px-4 text-sm text-yellow-700">{booking.guitar}</td>
-                  <td className="py-3 px-4 text-sm text-gray-600">{booking.date}</td>
-                  <td className={`py-2 font-semibold ${booking.status === "Confirmed" ? "text-green-600" : booking.status === "Pending" ? "text-yellow-600" : "text-red-600"}`}>
-                    {booking.status}
-                  </td>
+              {recentOrders.map((order) => (
+                <tr key={order.id} className="border-b hover:bg-gray-50">
+                  <td className="py-3 px-4 text-sm font-semibold text-gray-800">{order.customer}</td>
+                  <td className="py-3 px-4 text-sm text-yellow-700">{order.guitar}</td>
+                  <td className="py-3 px-4 text-sm text-gray-600">{order.date}</td>
+                  <td className={`py-2 font-semibold ${order.status === "Confirmed" ? "text-green-600" : order.status === "Pending" ? "text-yellow-600" : "text-red-600"}`}>{order.status}</td>
                 </tr>
               ))}
             </tbody>

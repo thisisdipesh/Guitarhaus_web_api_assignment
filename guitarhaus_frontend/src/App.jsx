@@ -41,8 +41,8 @@ const GuitarDetail = lazy(() => import("./components/public/GuitarDetail"));
 const Dashboard = lazy(() => import("./components/private/dashboard/Dashboard"));
 const AddGuitar = lazy(() => import("./components/private/packages/AddGuitar"));
 const ManageGuitars = lazy(() => import("./components/private/packages/ManageGuitars"));
-const Pending = lazy(() => import("./components/private/bookings/Pending"));
-const Confirmed = lazy(() => import("./components/private/bookings/Confirmed"));
+const PendingOrders = lazy(() => import("./components/private/orders/PendingOrders"));
+const ConfirmedOrders = lazy(() => import("./components/private/orders/ConfirmedOrders"));
 const Payments = lazy(() => import("./components/private/payments/Payments"));
 const Users = lazy(() => import("./components/private/users/Users"));
 const Reviews = lazy(() => import("./components/private/reviews/Reviews"));
@@ -150,8 +150,8 @@ function App() {
           { path: "dashboard", element: <Suspense fallback={<LoadingFallback />}><Dashboard /></Suspense>, errorElement: <ErrorFallback /> },
           { path: "addguitar", element: <Suspense fallback={<LoadingFallback />}><AddGuitar /></Suspense>, errorElement: <ErrorFallback /> },
           { path: "manageguitars", element: <Suspense fallback={<LoadingFallback />}><ManageGuitars /></Suspense>, errorElement: <ErrorFallback /> },
-          { path: "pending", element: <Suspense fallback={<LoadingFallback />}><Pending /></Suspense>, errorElement: <ErrorFallback /> },
-          { path: "confirmed", element: <Suspense fallback={<LoadingFallback />}><Confirmed /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "pending", element: <Suspense fallback={<LoadingFallback />}><PendingOrders /></Suspense>, errorElement: <ErrorFallback /> },
+          { path: "confirmed", element: <Suspense fallback={<LoadingFallback />}><ConfirmedOrders /></Suspense>, errorElement: <ErrorFallback /> },
           { path: "payments", element: <Suspense fallback={<LoadingFallback />}><Payments /></Suspense>, errorElement: <ErrorFallback /> },
           { path: "users", element: <Suspense fallback={<LoadingFallback />}><Users /></Suspense>, errorElement: <ErrorFallback /> },
           { path: "reviews", element: <Suspense fallback={<LoadingFallback />}><Reviews /></Suspense>, errorElement: <ErrorFallback /> },

@@ -70,17 +70,17 @@ const Sidebar = () => {
         </div>
 
         <div>
-          <button onClick={() => toggleMenu("bookings")} className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-700">
+          <button onClick={() => toggleMenu("orders")} className="flex items-center justify-between w-full p-2 rounded-lg hover:bg-gray-700">
             <div className="flex items-center gap-3">
               <Calendar size={20} />
-              {!isCollapsed && <span>Bookings</span>}
+              {!isCollapsed && <span>Orders</span>}
             </div>
-            {!isCollapsed && (openMenus.bookings ? <ChevronDown size={18} /> : <ChevronRight size={18} />)}
+            {!isCollapsed && (openMenus.orders ? <ChevronDown size={18} /> : <ChevronRight size={18} />)}
           </button>
-          {!isCollapsed && openMenus.bookings && (
+          {!isCollapsed && openMenus.orders && (
             <div className="ml-6 space-y-1 mt-1">
-              <Link onClick={Pending} to="/admin/pending" className="block p-2 rounded hover:bg-gray-700">Pending</Link>
-              <Link onClick={Confirmed} to="/admin/confirmed" className="block p-2 rounded hover:bg-gray-700">Confirmed</Link>
+              <Link onClick={PendingOrders} to="/admin/pending" className="block p-2 rounded hover:bg-gray-700">Pending Orders</Link>
+              <Link onClick={ConfirmedOrders} to="/admin/confirmed" className="block p-2 rounded hover:bg-gray-700">Confirmed Orders</Link>
             </div>
           )}
         </div>
