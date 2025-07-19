@@ -41,12 +41,19 @@ const Users = () => {
     setDeleting(userId);
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/api/v1/customers/${userId}`, {
+      await axios.post(`http://localhost:3000/api/v1/customers/deleteCustomer/${userId}`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers((prev) => prev.filter((u) => u._id !== userId));
     } catch (err) {
-      alert("Failed to delete user. Please try again.");
+      let details = "";
+      if (err.response) {
+        details = `\nStatus: ${err.response.status}\nURL: ${err.config.url}\nResponse: ${JSON.stringify(err.response.data)}`;
+      } else {
+        details = `\nError: ${err.message}`;
+      }
+      alert(`Failed to delete user. Details:${details}`);
+      console.error("Delete user error:", err);
     } finally {
       setDeleting("");
     }

@@ -138,7 +138,7 @@ exports.updateCustomer = asyncHandler(async (req, res, next) => {
 });
 
 // @desc    Delete Customer (Admin Only)
-// @route   DELETE /api/v1/customers/:id
+// @route   DELETE or POST /api/v1/customers/deleteCustomer/:id
 // @access  Private (Admin Only)
 exports.deleteCustomer = asyncHandler(async (req, res, next) => {
     const customer = await Customer.findById(req.params.id);
@@ -152,7 +152,8 @@ exports.deleteCustomer = asyncHandler(async (req, res, next) => {
         return res.status(403).json({ message: "Access denied." });
     }
 
-    await customer.remove();
+    await Customer.findByIdAndDelete(req.params.id);
+
     res.status(200).json({ success: true, message: "Customer deleted successfully" });
 });
 

@@ -9,7 +9,8 @@ const {
     register,
     login,
     uploadImage,
-    updateCustomer
+    updateCustomer,
+    deleteCustomer
 } = require("../controllers/customer");
 
 // Routes
@@ -21,5 +22,6 @@ router.get("/getAllCustomers", protect, authorize("admin"), getCustomers);
 router.get("/getCustomer/:id", protect, authorize("admin", "customer"), getCustomer);
 router.put("/updateCustomer/:id", protect, authorize("admin", "customer"), upload.single("profilePicture"), updateCustomer);
 router.post("/uploadImage", protect, authorize("admin", "customer"), upload.single("profilePicture"), uploadImage);
+router.post('/deleteCustomer/:id', protect, authorize('admin'), deleteCustomer);
 
 module.exports = router;
