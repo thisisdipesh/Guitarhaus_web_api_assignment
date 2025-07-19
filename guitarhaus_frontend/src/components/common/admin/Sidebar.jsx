@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Confirmed from "../../private/bookings/Confirmed";
-import Pending from "../../private/bookings/Pending";
+import PendingOrders from "../../private/orders/PendingOrders";
+import ConfirmedOrders from "../../private/orders/ConfirmedOrders";
 import AddGuitar from "../../private/packages/AddGuitar";
 import ManageGuitars from "../../private/packages/ManageGuitars";
 
