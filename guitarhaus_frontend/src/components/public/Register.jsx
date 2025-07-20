@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
 import { FaGuitar } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import loginPoster from '../../assets/images/loginpage.png';
 import guitarHausLogo from '../../assets/images/guitarhaus_logo.png';
 
@@ -16,6 +16,8 @@ const Register = () => {
     confirmPassword: "",
   });
 
+  const navigate = useNavigate();
+
   const registerUser = async (userData) => {
     const response = await axios.post("/api/v1/customers/register", userData);
     return response.data;
@@ -26,6 +28,7 @@ const Register = () => {
     onSuccess: (data) => {
       alert("Registration successful! 🎉");
       console.log("User registered:", data);
+      navigate('/login');
     },
     onError: (error) => {
       alert("Registration failed. Please try again.");
