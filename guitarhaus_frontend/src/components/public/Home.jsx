@@ -47,7 +47,7 @@ const Home = () => {
           Explore Our Guitars
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {guitars.map((guitar) => (
+          {guitars.slice(0, 3).map((guitar) => (
             <GuitarCard key={guitar._id} guitarData={guitar} />
           ))}
         </div>
