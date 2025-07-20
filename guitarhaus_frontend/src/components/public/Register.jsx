@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
-import { FaApple, FaFacebook, FaGoogle } from "react-icons/fa";
+import { FaGuitar } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import loginPoster from '../../assets/images/loginpage.png';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -45,39 +46,42 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="absolute top-5 left-5">
         <Link to="/">
           <img
-            src="/src/assets/images/logo.png"
-            alt="GuitarHaus Logo"
-            className="h-12"
+            src={require('../../assets/images/guitarhaus_logo.png')}
+            alt="Guitar Haus Logo"
+            className="h-14"
           />
         </Link>
       </div>
       <div className="relative flex w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+        {/* Left: Guitar Poster Image */}
         <div className="hidden md:block w-1/2">
           <img
-            src="/src/assets/images/guitar5.jpg"
-            alt="Guitar Background"
-            className="object-cover w-full h-full"
+            src={loginPoster}
+            alt="GuitarHaus Poster"
+            className="object-contain w-full h-full bg-white"
           />
         </div>
-        <div className="w-full p-8 md:w-1/2">
-          <h2 className="text-2xl font-bold text-center text-gray-800">
-            Create an Account
-          </h2>
-          <p className="mb-6 text-sm text-center text-gray-500">
-            By creating an account, you agree to our{" "}
-            <Link to="/privacy" className="font-medium text-red-600 hover:underline">
-              Privacy Policy
-            </Link>{" "}
-            and{" "}
-            <Link to="/terms" className="font-medium text-red-600 hover:underline">
-              Terms of Use
-            </Link>
-            .
-          </p>
+        {/* Right: Register Form */}
+        <div className="w-full p-8 md:w-1/2 flex flex-col justify-center">
+          <div className="flex flex-col items-center mb-4">
+            <FaGuitar className="text-3xl text-gray-700 mb-2" />
+            <h2 className="text-2xl font-bold text-gray-800 mb-1">
+              Create an Account
+            </h2>
+            <p className="mb-2 text-center text-gray-500 text-sm">
+              By creating an account, you agree to our{' '}
+              <Link to="/privacy" className="font-medium text-gray-700 hover:underline">
+                Privacy Policy
+              </Link>{' '}and{' '}
+              <Link to="/terms" className="font-medium text-gray-700 hover:underline">
+                Terms of Use
+              </Link>.
+            </p>
+          </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
             <div className="flex space-x-4">
@@ -93,7 +97,7 @@ const Register = () => {
                   type="text"
                   name="fname"
                   placeholder="John"
-                  className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                   value={formData.fname}
                   onChange={handleChange}
                   required
@@ -111,7 +115,7 @@ const Register = () => {
                   type="text"
                   name="lname"
                   placeholder="Doe"
-                  className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                  className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                   value={formData.lname}
                   onChange={handleChange}
                   required
@@ -131,7 +135,7 @@ const Register = () => {
                 type="email"
                 name="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                 value={formData.email}
                 onChange={handleChange}
                 required
@@ -150,7 +154,7 @@ const Register = () => {
                 type="tel"
                 name="phone"
                 placeholder="123-456-7890"
-                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                 value={formData.phone}
                 onChange={handleChange}
                 required
@@ -169,7 +173,7 @@ const Register = () => {
                 type="password"
                 name="password"
                 placeholder="Enter your password"
-                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                 value={formData.password}
                 onChange={handleChange}
                 required
@@ -188,7 +192,7 @@ const Register = () => {
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm your password"
-                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-red-500 focus:border-red-500"
+                className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
@@ -197,34 +201,18 @@ const Register = () => {
 
             <button
               type="submit"
-              className="w-full px-4 py-2 font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+              className="w-full px-4 py-2 font-bold text-white bg-gray-700 rounded-lg hover:bg-gray-800"
               disabled={mutation.isPending}
             >
               {mutation.isPending ? "Registering..." : "CREATE ACCOUNT"}
             </button>
           </form>
 
-          <div className="flex items-center justify-center my-6">
-            <span className="w-16 h-px bg-gray-300"></span>
-            <span className="mx-2 text-sm text-gray-500">OR</span>
-            <span className="w-16 h-px bg-gray-300"></span>
-          </div>
-
-          <div className="flex justify-center space-x-4">
-            <button className="p-3 text-gray-600 bg-white border border-gray-300 rounded-full hover:bg-gray-100">
-              <FaGoogle size={20} />
-            </button>
-            <button className="p-3 text-gray-600 bg-white border border-gray-300 rounded-full hover:bg-gray-100">
-              <FaFacebook size={20} />
-            </button>
-            <button className="p-3 text-gray-600 bg-white border border-gray-300 rounded-full hover:bg-gray-100">
-              <FaApple size={20} />
-            </button>
-          </div>
+          {/* Social login and divider removed for consistency with login page */}
 
           <p className="mt-6 text-sm text-center text-gray-500">
             Already have an account?{" "}
-            <Link to="/login" className="font-medium text-red-600 hover:underline">
+            <Link to="/login" className="font-medium text-gray-700 hover:underline">
               Login
             </Link>
           </p>
