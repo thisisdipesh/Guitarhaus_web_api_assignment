@@ -97,7 +97,7 @@ const Register = () => {
                   id="fname"
                   type="text"
                   name="fname"
-                  placeholder="John"
+                  placeholder="First Name"
                   className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                   value={formData.fname}
                   onChange={handleChange}
@@ -115,7 +115,7 @@ const Register = () => {
                   id="lname"
                   type="text"
                   name="lname"
-                  placeholder="Doe"
+                  placeholder="Last Name"
                   className="w-full px-4 py-2 text-gray-700 bg-gray-100 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400"
                   value={formData.lname}
                   onChange={handleChange}
