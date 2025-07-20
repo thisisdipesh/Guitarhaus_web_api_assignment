@@ -109,6 +109,12 @@ exports.getGuitar = asyncHandler(async (req, res, next) => {
 // @route   POST /api/v1/guitars
 // @access  Private (Admin only)
 exports.createGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Create Guitar - User:', req.user);
+  console.log('Create Guitar - Request body:', req.body);
+  console.log('Create Guitar - File:', req.file);
+  console.log('Create Guitar - Headers:', req.headers);
+  console.log('Create Guitar - Content-Type:', req.headers['content-type']);
+
   if (req.user.role !== "admin") {
     return res.status(403).json({ 
       success: false, 
@@ -119,14 +125,17 @@ exports.createGuitar = asyncHandler(async (req, res, next) => {
   // Handle uploaded image
   if (req.file) {
     req.body.images = [req.file.filename];
+    console.log('Image uploaded:', req.file.filename);
   } else {
     req.body.images = [];
+    console.log('No image uploaded');
   }
 
   // Handle specifications object
   if (req.body.specifications) {
     try {
       req.body.specifications = JSON.parse(req.body.specifications);
+      console.log('Specifications parsed:', req.body.specifications);
     } catch (error) {
       console.error('Error parsing specifications:', error);
     }
@@ -136,7 +145,11 @@ exports.createGuitar = asyncHandler(async (req, res, next) => {
   if (req.body.price) req.body.price = Number(req.body.price);
   if (req.body.stock) req.body.stock = Number(req.body.stock);
 
+  console.log('Final request body:', req.body);
+
   const guitar = await Guitar.create(req.body);
+
+  console.log('Guitar created:', guitar);
 
   res.status(201).json({
     success: true,
@@ -148,6 +161,11 @@ exports.createGuitar = asyncHandler(async (req, res, next) => {
 // @route   PUT /api/v1/guitars/:id
 // @access  Private (Admin only)
 exports.updateGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Update Guitar - User:', req.user);
+  console.log('Update Guitar - Request body:', req.body);
+  console.log('Update Guitar - File:', req.file);
+  console.log('Update Guitar - ID:', req.params.id);
+
   if (req.user.role !== "admin") {
     return res.status(403).json({ 
       success: false, 
@@ -167,12 +185,14 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
   // Handle uploaded image
   if (req.file) {
     req.body.images = [req.file.filename];
+    console.log('New image uploaded:', req.file.filename);
   }
 
   // Handle specifications object
   if (req.body.specifications) {
     try {
       req.body.specifications = JSON.parse(req.body.specifications);
+      console.log('Specifications parsed:', req.body.specifications);
     } catch (error) {
       console.error('Error parsing specifications:', error);
     }
@@ -182,10 +202,14 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
   if (req.body.price) req.body.price = Number(req.body.price);
   if (req.body.stock) req.body.stock = Number(req.body.stock);
 
+  console.log('Final update body:', req.body);
+
   guitar = await Guitar.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true
   });
+
+  console.log('Guitar updated:', guitar);
 
   res.status(200).json({
     success: true,
@@ -197,6 +221,9 @@ exports.updateGuitar = asyncHandler(async (req, res, next) => {
 // @route   DELETE /api/v1/guitars/:id
 // @access  Private (Admin only)
 exports.deleteGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Delete Guitar - User:', req.user);
+  console.log('Delete Guitar - ID:', req.params.id);
+
   if (req.user.role !== "admin") {
     return res.status(403).json({ 
       success: false, 
@@ -213,7 +240,10 @@ exports.deleteGuitar = asyncHandler(async (req, res, next) => {
     });
   }
 
-  await guitar.remove();
+  // Use findByIdAndDelete instead of remove() (which is deprecated)
+  await Guitar.findByIdAndDelete(req.params.id);
+
+  console.log('Guitar deleted successfully:', req.params.id);
 
   res.status(200).json({
     success: true,

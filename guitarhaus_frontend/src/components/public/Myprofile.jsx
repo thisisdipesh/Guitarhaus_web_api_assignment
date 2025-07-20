@@ -47,7 +47,7 @@ const Myprofile = () => {
               {/* Profile Picture */}
               <div className="md:w-1/3 text-center">
                 <img
-                  src={`http://localhost:3000/${user.profileImage}`}
+                  src={`http://localhost:3000/uploads/${user.profileImage}`}
                   alt="Profile"
                   className="w-32 h-32 object-cover rounded-full mx-auto border-4 border-red-500"
                 />

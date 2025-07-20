@@ -42,11 +42,30 @@ if (process.env.NODE_ENV === "development") {
     app.use(morgan("dev"));
 }
 
+// Set static folder (before security headers)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Add specific route for serving images
+app.get('/uploads/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.join(__dirname, 'public', 'uploads', filename);
+  res.sendFile(filepath);
+});
+
 // Sanitize data
 app.use(mongoSanitize());
 
-// Set security headers
-app.use(helmet());
+// Set security headers with image policy
+// app.use(helmet({
+//   contentSecurityPolicy: {
+//     directives: {
+//       defaultSrc: ["'self'"],
+//       imgSrc: ["'self'", "data:", "http:", "https:"],
+//       styleSrc: ["'self'", "'unsafe-inline'"],
+//       scriptSrc: ["'self'"],
+//     },
+//   },
+// }));
 
 // Prevent XSS attacks
 app.use(xss());
@@ -56,9 +75,6 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     next();
 });
-
-// Set static folder
-app.use(express.static(path.join(__dirname, 'public')));
 
 // Mount routers
 app.use("/api/v1/customers", auth);

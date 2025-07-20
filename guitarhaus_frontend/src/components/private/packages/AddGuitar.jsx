@@ -56,16 +56,34 @@ const AddPackages = () => {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("stock", formData.stock);
     formDataToSend.append("specifications", JSON.stringify(formData.specifications));
-    formDataToSend.append("images", formData.image);
+    formDataToSend.append("image", formData.image);
 
+    // Debug FormData contents
+    console.log("FORM DATA TO SEND:", formDataToSend);
+    console.log("Image file:", formData.image);
+    console.log("Image file name:", formData.image?.name);
+    console.log("Image file size:", formData.image?.size);
+    console.log("Image file type:", formData.image?.type);
+    
+    // Log all FormData entries
+    for (let [key, value] of formDataToSend.entries()) {
+      console.log(`FormData entry: ${key} = ${value}`);
+    }
     try {
       const token = localStorage.getItem("token");
+      console.log("Token:", token ? "Token exists" : "No token found");
+      console.log("Token length:", token?.length);
+      
+      if (!token) {
+        setError("No authentication token found. Please login again.");
+        return;
+      }
+      
       await axios.post(
         "http://localhost:3000/api/v1/guitars",
         formDataToSend,
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
           },
         }

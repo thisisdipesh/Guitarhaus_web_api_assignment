@@ -46,13 +46,23 @@ const ManageGuitars = () => {
     if (!window.confirm("Are you sure you want to delete this guitar?")) return;
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/api/v1/guitars/${id}`, {
+      console.log('Deleting guitar with ID:', id);
+      console.log('Token:', token ? 'Token exists' : 'No token');
+      
+      const response = await axios.delete(`http://localhost:3000/api/v1/guitars/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      console.log('Delete response:', response.data);
       setGuitars(guitars.filter((guitar) => guitar._id !== id));
       setMessage("Guitar deleted successfully!");
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
     } catch (error) {
-      setMessage("Error deleting guitar. Please try again.");
+      console.error('Delete guitar error:', error);
+      console.error('Error response:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Error deleting guitar. Please try again.';
+      setMessage(errorMessage);
     }
   };
 
@@ -75,7 +85,7 @@ const ManageGuitars = () => {
     
     // Set current image preview
     if (guitar.images && guitar.images.length > 0) {
-      setImagePreview(`http://localhost:3000/uploads/${guitar.images[0]}`);
+              setImagePreview(`http://localhost:3000/uploads/${guitar.images[0]}`);
     } else {
       setImagePreview(null);
     }
@@ -160,6 +170,8 @@ const ManageGuitars = () => {
       await fetchGuitars();
 
       setMessage("Guitar updated successfully!");
+      // Clear success message after 3 seconds
+      setTimeout(() => setMessage(""), 3000);
       setShowEditModal(false);
       setEditingGuitar(null);
       setSelectedImage(null);
@@ -194,7 +206,15 @@ const ManageGuitars = () => {
   return (
     <div className="p-6 bg-white rounded-lg shadow-md overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4 text-yellow-700">Manage Guitars</h2>
-      {message && <p className="text-red-600 mb-2">{message}</p>}
+      {message && (
+        <p className={`mb-2 p-3 rounded-md ${
+          message.includes('successfully') 
+            ? 'text-green-700 bg-green-100 border border-green-300' 
+            : 'text-red-700 bg-red-100 border border-red-300'
+        }`}>
+          {message}
+        </p>
+      )}
       {loading ? (
         <p>Loading guitars...</p>
       ) : (
