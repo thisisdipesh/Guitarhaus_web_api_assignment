@@ -116,11 +116,12 @@ const Login = () => {
                 required
               />
             </div>
-            <div className="text-right">
+            {/* Remove the 'Forgot your password?' link */}
+            {/* <div className="text-right">
               <a href="#" className="text-sm text-gray-600 hover:underline">
                 Forgot your password?
               </a>
-            </div>
+            </div> */}
 
             <button
               type="submit"
