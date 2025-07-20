@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { FaGuitar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import loginPoster from '../../assets/images/loginpage.png';
+import guitarHausLogo from '../../assets/images/guitarhaus_logo.png';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -50,7 +51,7 @@ const Register = () => {
       <div className="absolute top-5 left-5">
         <Link to="/">
           <img
-            src={require('../../assets/images/guitarhaus_logo.png')}
+            src={guitarHausLogo}
             alt="Guitar Haus Logo"
             className="h-14"
           />
