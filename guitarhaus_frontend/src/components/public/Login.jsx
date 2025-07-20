@@ -131,7 +131,8 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="flex items-center justify-center my-6">
+          {/* Remove the social login divider and buttons */}
+          {/* <div className="flex items-center justify-center my-6">
             <span className="w-16 h-px bg-gray-300"></span>
             <span className="mx-2 text-sm text-gray-500">OR</span>
             <span className="w-16 h-px bg-gray-300"></span>
@@ -147,7 +148,7 @@ const Login = () => {
             <button className="p-3 text-gray-600 bg-white border border-gray-300 rounded-full hover:bg-gray-100">
               <FaApple size={20} />
             </button>
-          </div>
+          </div> */}
 
           <p className="mt-6 text-sm text-center text-gray-500">
             Don't have an account?{" "}
