@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import Footer from "../common/customer/Footer";
 import Navbar from "../common/customer/Navbar";
 import { FaGuitar, FaUser, FaEnvelope, FaPhone } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const Myprofile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -83,7 +85,7 @@ const Myprofile = () => {
                   <p className="text-yellow-900 font-bold">{user && user.email}</p>
                 </div>
               </div>
-              <button className="mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-3 px-8 rounded-xl text-lg font-bold hover:from-yellow-700 hover:to-yellow-800 transition duration-300 shadow-lg flex items-center gap-3">
+              <button className="mt-8 bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-3 px-8 rounded-xl text-lg font-bold hover:from-yellow-700 hover:to-yellow-800 transition duration-300 shadow-lg flex items-center gap-3" onClick={() => navigate('/editprofile')}>
                 <FaGuitar size={20} /> Edit Profile
               </button>
             </div>
