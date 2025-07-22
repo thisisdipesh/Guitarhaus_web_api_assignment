@@ -84,7 +84,7 @@ const Checkout = () => {
 
   // Khalti Payment Configuration
   const khaltiConfig = {
-    publicKey: "test_public_key_dc74e0fd57cb46cd93832aee0a390234",
+    publicKey: "test_public_key_xxxxxxxxxxxxxxxxxxxxx",
     productIdentity: isCartCheckout ? "cart_checkout" : packageData?._id,
     productName: isCartCheckout ? "GuitarHaus Cart" : (packageData?.name || packageData?.title || "Guitar"),
     productUrl: isCartCheckout ? `http://localhost:5173/mycart` : `http://localhost:5173/guitars/${packageData?._id}`,

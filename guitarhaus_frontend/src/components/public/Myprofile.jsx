@@ -18,7 +18,7 @@ const Myprofile = () => {
           return;
         }
 
-        const response = await axios.get(`http://localhost:3000/api/v1/auth/getCustomer/${userId}`, {
+        const response = await axios.get(`http://localhost:3000/api/v1/customers/getCustomer/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
