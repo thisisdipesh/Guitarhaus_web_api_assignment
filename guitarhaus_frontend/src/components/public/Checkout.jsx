@@ -92,33 +92,40 @@ const Checkout = () => {
       onSuccess(payload) {
         console.log("Payment Success:", payload);
 
-        // Save booking details after payment success
-        const bookingData = {
-          fullName: formData.fullName,
-          email: formData.email,
-          phone: formData.phone,
-          paymentMethod: "khalti",
-          paymentId: payload.idx,
-        };
-
-        if (isCartCheckout) {
-          // Cart checkout - save multiple bookings
-          bookingData.cartItems = cartItems;
-        } else {
-          // Single guitar checkout
-          bookingData.packageId = id;
-          bookingData.tickets = formData.tickets;
-        }
-
-        axios
-          .post("http://localhost:3000/api/v1/bookings", bookingData)
-          .then(() => {
-            alert("Order Successful! 🚀");
-            navigate('/');
-          })
-          .catch(() => {
-            alert("Order saved failed, but payment was successful.");
-          });
+        // 1. Verify payment with backend
+        axios.post("http://localhost:3000/api/v1/payments/verify-khalti", {
+          token: payload.token,
+          amount: payload.amount,
+        })
+        .then((verifyRes) => {
+          if (verifyRes.data.success) {
+            // 2. Only create booking/order if verification is successful
+            const bookingData = {
+              fullName: formData.fullName,
+              email: formData.email,
+              phone: formData.phone,
+              paymentMethod: "khalti",
+              paymentId: payload.idx,
+            };
+            if (isCartCheckout) {
+              bookingData.cartItems = cartItems;
+            } else {
+              bookingData.packageId = id;
+              bookingData.tickets = formData.tickets;
+            }
+            return axios.post("http://localhost:3000/api/v1/bookings", bookingData);
+          } else {
+            throw new Error("Payment verification failed");
+          }
+        })
+        .then(() => {
+          alert("Order Successful! 🚀");
+          navigate('/');
+        })
+        .catch((err) => {
+          alert("Payment verification failed or order could not be saved.");
+          console.error(err);
+        });
       },
       onError(error) {
         console.log("Payment Error:", error);
