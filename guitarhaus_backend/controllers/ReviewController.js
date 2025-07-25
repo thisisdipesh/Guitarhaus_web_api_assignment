@@ -185,3 +185,24 @@ exports.getUserReviews = asyncHandler(async (req, res, next) => {
     data: reviews
   });
 });
+
+// @desc    Get all reviews (Admin only)
+// @route   GET /api/v1/reviews/admin/all
+// @access  Private (Admin)
+exports.getAllReviews = asyncHandler(async (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. Admins only."
+    });
+  }
+  const reviews = await Review.find()
+    .populate({ path: 'customer', select: 'fname lname' })
+    .populate({ path: 'guitar', select: 'name brand price images' })
+    .sort('-createdAt');
+  res.status(200).json({
+    success: true,
+    count: reviews.length,
+    data: reviews
+  });
+});

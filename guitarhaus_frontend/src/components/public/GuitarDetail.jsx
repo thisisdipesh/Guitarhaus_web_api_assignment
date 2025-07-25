@@ -21,6 +21,12 @@ const PackageDetail = () => {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
   const token = localStorage.getItem("token");
+  const [reviewText, setReviewText] = useState("");
+  const [reviews, setReviews] = useState([]);
+  const [reviewError, setReviewError] = useState("");
+  const [reviewSuccess, setReviewSuccess] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const fname = localStorage.getItem("fname") || "User";
 
   useEffect(() => {
     const fetchGuitarDetails = async () => {
@@ -50,6 +56,21 @@ const PackageDetail = () => {
     fetchGuitarDetails();
     if (token) fetchWishlistData();
   }, [id, token]);
+
+  // Example: Fetch reviews for this guitar (replace with real API call)
+  useEffect(() => {
+    // Fetch reviews from backend
+    axios.get(`http://localhost:3000/api/v1/reviews/guitar/${id}`)
+      .then(res => {
+        setReviews(res.data.data.map(r => ({
+          text: r.comment,
+          date: new Date(r.createdAt).toLocaleString(),
+          fname: r.customer?.fname || "User",
+          rating: r.rating
+        })));
+      })
+      .catch(() => setReviews([]));
+  }, [id]);
 
   const handleWishlistToggle = async () => {
     if (!token) {
@@ -100,6 +121,44 @@ const PackageDetail = () => {
       alert("Failed to add to cart. Please try again.");
     } finally {
       setAddingToCart(false);
+    }
+  };
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    setReviewError("");
+    setReviewSuccess("");
+    if (!reviewText.trim()) {
+      setReviewError("Review cannot be empty.");
+      return;
+    }
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `http://localhost:3000/api/v1/reviews/guitar/${id}`,
+        {
+          rating: reviewRating,
+          title: "Review",
+          comment: reviewText
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setReviewText("");
+      setReviewRating(5);
+      setReviewSuccess("Review submitted!");
+      // Refetch reviews
+      axios.get(`http://localhost:3000/api/v1/reviews/guitar/${id}`)
+        .then(res => {
+          setReviews(res.data.data.map(r => ({
+            text: r.comment,
+            date: new Date(r.createdAt).toLocaleString(),
+            fname: r.customer?.fname || "User",
+            rating: r.rating
+          })));
+        })
+        .catch(() => setReviews([]));
+    } catch (err) {
+      setReviewError("Failed to submit review. You may have already reviewed this guitar.");
     }
   };
 
@@ -241,6 +300,61 @@ const PackageDetail = () => {
             </div>
           </div>
         )}
+      </div>
+      
+      {/* Review Section */}
+      <div className="max-w-2xl mx-auto mt-12 bg-white rounded-xl shadow-lg p-6 border border-yellow-200">
+        <h2 className="text-2xl font-bold text-yellow-900 mb-4">Reviews</h2>
+        <form onSubmit={handleReviewSubmit} className="mb-6 flex flex-col gap-3">
+          <div className="flex items-center gap-2 mb-2">
+            {[1,2,3,4,5].map(star => (
+              <button
+                type="button"
+                key={star}
+                onClick={() => setReviewRating(star)}
+                className={star <= reviewRating ? "text-yellow-500" : "text-gray-300"}
+                aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+              >
+                &#9733;
+              </button>
+            ))}
+            <span className="ml-2 text-sm text-gray-600">{reviewRating} / 5</span>
+          </div>
+          <textarea
+            className="w-full border border-yellow-300 rounded-lg p-3 focus:ring-2 focus:ring-yellow-500"
+            rows={3}
+            placeholder="Write your review..."
+            value={reviewText}
+            onChange={e => setReviewText(e.target.value)}
+          />
+          {reviewError && <p className="text-red-600 text-sm">{reviewError}</p>}
+          {reviewSuccess && <p className="text-green-600 text-sm">{reviewSuccess}</p>}
+          <button
+            type="submit"
+            className="self-end bg-yellow-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-yellow-700 transition"
+          >
+            Submit Review
+          </button>
+        </form>
+        <div className="space-y-4">
+          {reviews.length === 0 ? (
+            <p className="text-gray-500">No reviews yet. Be the first to review this guitar!</p>
+          ) : (
+            reviews.map((review, idx) => (
+              <div key={idx} className="bg-yellow-50 p-4 rounded-lg border border-yellow-100">
+                <p className="text-gray-800 font-bold mb-1">{review.fname}</p>
+                <div className="flex items-center gap-1 mb-1">
+                  {Array.from({ length: review.rating || 0 }, (_, i) => (
+                    <span key={i} className="text-yellow-500">&#9733;</span>
+                  ))}
+                  {review.rating && <span className="ml-2 text-xs text-gray-600">{review.rating} / 5</span>}
+                </div>
+                <p className="text-gray-800">{review.text}</p>
+                <p className="text-xs text-gray-500 mt-2">{review.date}</p>
+              </div>
+            ))
+          )}
+        </div>
       </div>
       
       <Footer />

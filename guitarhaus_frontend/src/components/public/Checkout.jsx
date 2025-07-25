@@ -1,5 +1,4 @@
 import axios from "axios";
-import KhaltiCheckout from "khalti-checkout-web";
 import React, { useEffect, useState } from "react";
 import { FaGuitar, FaCreditCard, FaUser, FaEnvelope, FaPhone, FaShoppingCart, FaCheckCircle, FaStar, FaCrown, FaTrash } from "react-icons/fa";
 import { useParams, useNavigate } from "react-router-dom";
@@ -11,6 +10,7 @@ import guitar3 from '/src/assets/images/guitar3.jpg';
 import guitar4 from '/src/assets/images/guitar4.jpg';
 import guitar5 from '/src/assets/images/guitar5.jpg';
 const guitarImages = [guitar1, guitar2, guitar3, guitar4, guitar5];
+import CryptoJS from "crypto-js";
 
 const Checkout = () => {
   const { id } = useParams(); // Get package ID from URL (optional)
@@ -82,72 +82,44 @@ const Checkout = () => {
     }, 0);
   };
 
-  // Khalti Payment Configuration
-  const khaltiConfig = {
-    publicKey: "test_public_key_xxxxxxxxxxxxxxxxxxxxx",
-    productIdentity: isCartCheckout ? "cart_checkout" : packageData?._id,
-    productName: isCartCheckout ? "GuitarHaus Cart" : (packageData?.name || packageData?.title || "Guitar"),
-    productUrl: isCartCheckout ? `http://localhost:5173/mycart` : `http://localhost:5173/guitars/${packageData?._id}`,
-    eventHandler: {
-      onSuccess(payload) {
-        console.log("Payment Success:", payload);
-
-        // 1. Verify payment with backend
-        axios.post("http://localhost:3000/api/v1/payments/verify-khalti", {
-          token: payload.token,
-          amount: payload.amount,
-        })
-        .then((verifyRes) => {
-          if (verifyRes.data.success) {
-            // 2. Only create booking/order if verification is successful
-            const bookingData = {
-              fullName: formData.fullName,
-              email: formData.email,
-              phone: formData.phone,
-              paymentMethod: "khalti",
-              paymentId: payload.idx,
-            };
-            if (isCartCheckout) {
-              bookingData.cartItems = cartItems;
-            } else {
-              bookingData.packageId = id;
-              bookingData.tickets = formData.tickets;
-            }
-            return axios.post("http://localhost:3000/api/v1/bookings", bookingData);
-          } else {
-            throw new Error("Payment verification failed");
-          }
-        })
-        .then(() => {
-          alert("Order Successful! 🚀");
-          navigate('/');
-        })
-        .catch((err) => {
-          alert("Payment verification failed or order could not be saved.");
-          console.error(err);
-        });
-      },
-      onError(error) {
-        console.log("Payment Error:", error);
-        alert("Payment Failed. Please try again.");
-      },
-      onClose() {
-        console.log("Khalti popup closed.");
-      },
-    },
-    paymentPreference: ["KHALTI"],
-  };
-
-  const khaltiCheckout = new KhaltiCheckout(khaltiConfig);
-
-  const handlePayment = () => {
-    if (isCartCheckout && cartItems.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
-
-    const totalAmount = isCartCheckout ? calculateCartTotal() : (packageData?.price * formData.tickets);
-    khaltiCheckout.show({ amount: totalAmount * 100 }); // Convert to paisa
+  // eSewa v2 Payment Handler (uses actual checkout total)
+  const handleEsewaPay = (e) => {
+    e.preventDefault();
+    // Use actual checkout total in rupees, formatted as string with two decimals
+    const totalAmount = (isCartCheckout ? calculateCartTotal() : (packageData?.price * formData.tickets)) / 100;
+    const totalAmountStr = totalAmount.toFixed(2);
+    const transactionUUID = `GH-ORDER-${Date.now()}`;
+    const productCode = "EPAYTEST";
+    const secret = "8gBm/:&EnhH.1/q";
+    const message = `${totalAmountStr},${transactionUUID},${productCode}`;
+    const hash = CryptoJS.HmacSHA256(
+      CryptoJS.enc.Utf8.parse(message),
+      CryptoJS.enc.Utf8.parse(secret)
+    );
+    const signature = CryptoJS.enc.Base64.stringify(hash);
+    const params = {
+      total_amount: totalAmountStr,
+      transaction_uuid: transactionUUID,
+      product_code: productCode,
+      signed_field_names: "total_amount,transaction_uuid,product_code",
+      signature,
+      success_url: "http://localhost:5173/success",
+      failure_url: "http://localhost:5173/failure",
+    };
+    console.log("eSewa v2 payload:", params);
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+    Object.entries(params).forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
   };
 
   if (loading) return <p className="text-center py-10 text-lg">Loading checkout details...</p>;
@@ -362,11 +334,10 @@ const Checkout = () => {
                 {/* Payment Button */}
                 <button
                   type="button"
-                  onClick={handlePayment}
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-4 rounded-lg text-lg font-bold hover:from-yellow-600 hover:to-yellow-700 transition duration-300 shadow-lg flex items-center justify-center gap-3"
+                  onClick={handleEsewaPay}
+                  className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white py-4 rounded-lg text-lg font-bold hover:from-green-600 hover:to-green-800 transition duration-300 shadow-lg flex items-center justify-center gap-3 mt-4"
                 >
-                  <FaCreditCard size={20} />
-                  Pay with Khalti
+                  <FaCreditCard size={20} /> Pay with eSewa
                 </button>
               </form>
             </div>

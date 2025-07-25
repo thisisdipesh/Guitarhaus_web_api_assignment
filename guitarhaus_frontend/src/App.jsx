@@ -37,6 +37,8 @@ const Mycart = lazy(() => import("./components/public/Mycart"));
 const EditProfile = lazy(() => import("./components/public/Editprofile"));
 const Guitars = lazy(() => import("./components/public/Guitars"));
 const GuitarDetail = lazy(() => import("./components/public/GuitarDetail"));
+const Success = lazy(() => import("./components/public/Success"));
+const Failure = lazy(() => import("./components/public/Failure"));
 
 const Dashboard = lazy(() => import("./components/private/dashboard/Dashboard"));
 const AddGuitar = lazy(() => import("./components/private/packages/AddGuitar"));
@@ -138,6 +140,16 @@ function App() {
     {
       path: "/guitars/:id",
       element: <Suspense fallback={<LoadingFallback />}><GuitarDetail /></Suspense>,
+      errorElement: <ErrorFallback />,
+    },
+    {
+      path: "/success",
+      element: <Suspense fallback={<LoadingFallback />}><Success /></Suspense>,
+      errorElement: <ErrorFallback />,
+    },
+    {
+      path: "/failure",
+      element: <Suspense fallback={<LoadingFallback />}><Failure /></Suspense>,
       errorElement: <ErrorFallback />,
     },
     // Admin routes - accessible only to admins

@@ -24,6 +24,7 @@ router.post('/verify-khalti', async (req, res) => {
             data: response.data,
         });
     } catch (error) {
+        console.log("error: ", error)
         res.status(400).json({
             success: false,
             message: error.response?.data || error.message,

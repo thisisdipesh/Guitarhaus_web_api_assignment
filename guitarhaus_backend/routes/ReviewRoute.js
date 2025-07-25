@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { protect } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 
 const {
   getGuitarReviews,
   addReview,
   updateReview,
   deleteReview,
-  getUserReviews
+  getUserReviews,
+  getAllReviews
 } = require("../controllers/ReviewController");
 
 // Public routes
@@ -19,5 +20,8 @@ router.post("/guitar/:guitarId", addReview);
 router.put("/:id", updateReview);
 router.delete("/:id", deleteReview);
 router.get("/user", getUserReviews);
+
+// Admin route to get all reviews
+router.get("/admin/all", protect, authorize("admin"), getAllReviews);
 
 module.exports = router;
