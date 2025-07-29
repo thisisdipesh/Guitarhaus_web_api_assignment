@@ -1,7 +1,7 @@
 const asyncHandler = require("../middleware/async");
 const Guitar = require("../models/Guitar");
 const { protect, authorize } = require("../middleware/auth");
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || ' ');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // @desc    Get all guitars
 // @route   GET /api/v1/guitars
