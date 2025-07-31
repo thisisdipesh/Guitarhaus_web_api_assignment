@@ -39,6 +39,7 @@ const Guitars = lazy(() => import("./components/public/Guitars"));
 const GuitarDetail = lazy(() => import("./components/public/GuitarDetail"));
 const Success = lazy(() => import("./components/public/Success"));
 const Failure = lazy(() => import("./components/public/Failure"));
+const Cancel = lazy(() => import("./components/public/Cancel"));
 
 const Dashboard = lazy(() => import("./components/private/dashboard/Dashboard"));
 const AddGuitar = lazy(() => import("./components/private/packages/AddGuitar"));
@@ -150,6 +151,11 @@ function App() {
     {
       path: "/failure",
       element: <Suspense fallback={<LoadingFallback />}><Failure /></Suspense>,
+      errorElement: <ErrorFallback />,
+    },
+    {
+      path: "/cancel",
+      element: <Suspense fallback={<LoadingFallback />}><Cancel /></Suspense>,
       errorElement: <ErrorFallback />,
     },
     // Admin routes - accessible only to admins

@@ -27,7 +27,11 @@ router.get('/stripe-session/:session_id', require('../controllers/GuitarControll
 router.post("/", protect, authorize("admin"), upload.single("image"), createGuitar);
 router.post('/create-stripe-product', createStripeProduct);
 router.post('/create-checkout-session', require('../controllers/GuitarController').createCheckoutSession);
+router.post('/create-onetime-checkout-session', require('../controllers/GuitarController').createOneTimeCheckoutSession);
 router.put("/:id", protect, authorize("admin"), upload.single("image"), updateGuitar);
 router.delete("/:id", protect, authorize("admin"), deleteGuitar);
+
+// Stripe webhook (no auth required)
+router.post('/webhook', require('../controllers/GuitarController').handleStripeWebhook);
 
 module.exports = router; 

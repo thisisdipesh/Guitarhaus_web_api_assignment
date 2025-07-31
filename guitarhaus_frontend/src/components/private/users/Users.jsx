@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaTimes, FaEnvelope, FaUser, FaShieldAlt, FaCalendar } from "react-icons/fa";
 
 const getInitials = (name) => {
   return name
@@ -15,6 +15,8 @@ const Users = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -35,6 +37,16 @@ const Users = () => {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleViewUser = (user) => {
+    setSelectedUser(user);
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedUser(null);
+  };
 
   const handleDelete = async (userId, userName) => {
     if (!window.confirm(`Are you sure you want to delete user '${userName}'? This action cannot be undone.`)) return;
@@ -107,26 +119,10 @@ const Users = () => {
                       <td className="px-6 py-4 text-sm flex gap-2 flex-wrap">
                         <button
                           className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-4 py-1 rounded-full font-bold shadow hover:from-yellow-500 hover:to-yellow-700 transition-all"
-                          onClick={() => alert(`View user details for ${user.fname || user.lname || user.email}`)}
+                          onClick={() => handleViewUser(user)}
                         >
                           View
                         </button>
-                        {(user.status === "Active" || user.isActive !== false) && (
-                          <button
-                            className="bg-gradient-to-r from-red-400 to-red-600 text-white px-4 py-1 rounded-full font-bold shadow hover:from-red-500 hover:to-red-700 transition-all"
-                            onClick={() => alert(`Deactivate user ${user.fname || user.lname || user.email}`)}
-                          >
-                            Deactivate
-                          </button>
-                        )}
-                        {(user.status === "Inactive" || user.isActive === false) && (
-                          <button
-                            className="bg-gradient-to-r from-green-400 to-green-600 text-white px-4 py-1 rounded-full font-bold shadow hover:from-green-500 hover:to-green-700 transition-all"
-                            onClick={() => alert(`Activate user ${user.fname || user.lname || user.email}`)}
-                          >
-                            Activate
-                          </button>
-                        )}
                         <button
                           className="bg-gradient-to-r from-gray-700 to-red-700 text-white px-4 py-1 rounded-full font-bold shadow hover:from-red-800 hover:to-red-900 transition-all"
                           disabled={deleting === user._id}
@@ -143,6 +139,104 @@ const Users = () => {
           )}
         </div>
       </div>
+
+      {/* User Details Modal */}
+      {showModal && selectedUser && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-yellow-900">User Details</h3>
+                <button
+                  onClick={handleCloseModal}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <FaTimes size={24} />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* User Avatar and Name */}
+                <div className="text-center">
+                  {selectedUser.image ? (
+                    <img 
+                      src={`http://localhost:3000/uploads/${selectedUser.image}`} 
+                      alt={selectedUser.fname || selectedUser.lname || selectedUser.email} 
+                      className="w-20 h-20 rounded-full border-4 border-yellow-200 shadow-lg mx-auto mb-4" 
+                    />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-yellow-200 flex items-center justify-center text-yellow-900 font-bold text-3xl border-4 border-yellow-100 shadow-lg mx-auto mb-4">
+                      {getInitials(`${selectedUser.fname || ""} ${selectedUser.lname || ""}`.trim() || selectedUser.email)}
+                    </div>
+                  )}
+                  <h4 className="text-xl font-bold text-gray-800">
+                    {selectedUser.fname || selectedUser.lname ? `${selectedUser.fname || ""} ${selectedUser.lname || ""}`.trim() : 'No Name'}
+                  </h4>
+                </div>
+
+                {/* User Information */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FaEnvelope className="text-yellow-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Email</p>
+                      <p className="font-semibold text-gray-800">{selectedUser.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FaUser className="text-yellow-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Full Name</p>
+                      <p className="font-semibold text-gray-800">
+                        {selectedUser.fname || selectedUser.lname ? `${selectedUser.fname || ""} ${selectedUser.lname || ""}`.trim() : 'Not provided'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FaShieldAlt className="text-yellow-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Role</p>
+                      <p className="font-semibold text-gray-800 capitalize">{selectedUser.role}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <FaCalendar className="text-yellow-600" />
+                    <div>
+                      <p className="text-sm text-gray-600">Joined</p>
+                      <p className="font-semibold text-gray-800">
+                        {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : 'Unknown'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className="w-4 h-4 rounded-full bg-green-500"></div>
+                    <div>
+                      <p className="text-sm text-gray-600">Status</p>
+                      <p className="font-semibold text-gray-800">
+                        {selectedUser.status || (selectedUser.isActive === false ? "Inactive" : "Active")}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <div className="pt-4">
+                  <button
+                    onClick={handleCloseModal}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-white font-bold py-3 px-6 rounded-2xl hover:from-yellow-500 hover:to-yellow-700 transition-all"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

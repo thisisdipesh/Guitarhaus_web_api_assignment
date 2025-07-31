@@ -50,18 +50,18 @@ const Guitars = () => {
               Discover the perfect guitar for your music journey. Browse our exclusive collection of acoustic, electric, and classical guitars.
             </p>
             <div className="flex flex-col md:flex-row gap-4 items-center md:items-start">
-              <div className="flex items-center bg-white rounded-lg shadow px-4 py-2 w-full md:w-80">
-                <FaSearch className="text-gray-400 mr-2" />
+              <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-4 py-3 w-full md:w-80 border border-white/20">
+                <FaSearch className="text-yellow-600 mr-3 text-lg" />
                 <input
                   type="text"
                   placeholder="Search by name or brand..."
-                  className="outline-none w-full bg-transparent text-gray-700"
+                  className="outline-none w-full bg-transparent text-gray-700 placeholder-gray-500"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <div className="flex items-center bg-white rounded-lg shadow px-4 py-2 w-full md:w-60">
-                <FaFilter className="text-gray-400 mr-2" />
+              <div className="flex items-center bg-white/90 backdrop-blur-sm rounded-xl shadow-lg px-4 py-3 w-full md:w-60 border border-white/20">
+                <FaFilter className="text-yellow-600 mr-3 text-lg" />
                 <select
                   className="outline-none w-full bg-transparent text-gray-700"
                   value={category}
@@ -90,21 +90,41 @@ const Guitars = () => {
 
       {/* Guitars Grid */}
       <div className="container mx-auto px-6 pb-20">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-10">
-          Explore Our Guitars
-        </h2>
+        {/* Results Header */}
+        <div className="text-center mb-12">
+          <h2 className="text-4xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mb-4">
+            Explore Our Guitars
+          </h2>
+          <p className="text-gray-600 text-lg">
+            {filteredGuitars.length} {filteredGuitars.length === 1 ? 'guitar' : 'guitars'} found
+          </p>
+        </div>
+
         {loading ? (
-          <p className="text-center py-10">Loading guitars...</p>
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+              <p className="text-gray-600 text-lg">Loading guitars...</p>
+            </div>
+          </div>
         ) : error ? (
-          <p className="text-center text-red-600 py-10">{error}</p>
+          <div className="text-center py-20">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-8 max-w-md mx-auto">
+              <p className="text-red-600 text-lg">{error}</p>
+            </div>
+          </div>
         ) : filteredGuitars.length === 0 ? (
-          <p className="text-center text-gray-600 py-10">No guitars found.</p>
+          <div className="text-center py-20">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 max-w-md mx-auto">
+              <FaGuitar className="text-gray-400 text-4xl mx-auto mb-4" />
+              <p className="text-gray-600 text-lg">No guitars found matching your criteria.</p>
+              <p className="text-gray-500 text-sm mt-2">Try adjusting your search or filters.</p>
+            </div>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredGuitars.map((guitar) => (
-              <div key={guitar._id} className="hover:scale-105 transition-transform duration-300">
-                <GuitarCard guitarData={guitar} />
-              </div>
+              <GuitarCard key={guitar._id} guitarData={guitar} />
             ))}
           </div>
         )}

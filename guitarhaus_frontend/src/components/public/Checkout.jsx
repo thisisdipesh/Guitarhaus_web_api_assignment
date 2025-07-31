@@ -10,7 +10,6 @@ import guitar3 from '/src/assets/images/guitar3.jpg';
 import guitar4 from '/src/assets/images/guitar4.jpg';
 import guitar5 from '/src/assets/images/guitar5.jpg';
 const guitarImages = [guitar1, guitar2, guitar3, guitar4, guitar5];
-import CryptoJS from "crypto-js";
 
 const Checkout = () => {
   const { id } = useParams(); // Get package ID from URL (optional)
@@ -82,44 +81,82 @@ const Checkout = () => {
     }, 0);
   };
 
-  // eSewa v2 Payment Handler (uses actual checkout total)
-  const handleEsewaPay = (e) => {
+  // Stripe Payment Handler
+  const handleStripePay = async (e) => {
     e.preventDefault();
-    // Use actual checkout total in rupees, formatted as string with two decimals
-    const totalAmount = (isCartCheckout ? calculateCartTotal() : (packageData?.price * formData.tickets)) / 100;
-    const totalAmountStr = totalAmount.toFixed(2);
-    const transactionUUID = `GH-ORDER-${Date.now()}`;
-    const productCode = "EPAYTEST";
-    const secret = "8gBm/:&EnhH.1/q";
-    const message = `${totalAmountStr},${transactionUUID},${productCode}`;
-    const hash = CryptoJS.HmacSHA256(
-      CryptoJS.enc.Utf8.parse(message),
-      CryptoJS.enc.Utf8.parse(secret)
-    );
-    const signature = CryptoJS.enc.Base64.stringify(hash);
-    const params = {
-      total_amount: totalAmountStr,
-      transaction_uuid: transactionUUID,
-      product_code: productCode,
-      signed_field_names: "total_amount,transaction_uuid,product_code",
-      signature,
-      success_url: "http://localhost:5173/success",
-      failure_url: "http://localhost:5173/failure",
-    };
-    console.log("eSewa v2 payload:", params);
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
-    Object.entries(params).forEach(([key, value]) => {
-      const input = document.createElement("input");
-      input.type = "hidden";
-      input.name = key;
-      input.value = value;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    
+    try {
+      setLoading(true);
+      setError("");
+      
+      const totalAmount = isCartCheckout ? calculateCartTotal() : (packageData?.price * formData.tickets);
+      
+      console.log('Initiating Stripe payment with:', {
+        isCartCheckout,
+        totalAmount,
+        items: isCartCheckout ? cartItems.map(item => ({
+          name: item.guitar?.name || 'Guitar',
+          price: item.guitar?.price || 0,
+          quantity: item.quantity,
+          brand: item.guitar?.brand || 'GuitarHaus'
+        })) : [{
+          name: packageData?.name || 'Guitar',
+          price: packageData?.price || 0,
+          quantity: formData.tickets,
+          brand: packageData?.brand || 'GuitarHaus'
+        }],
+        customerInfo: {
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone
+        }
+      });
+      
+      // Create checkout session with Stripe
+      const response = await axios.post('http://localhost:3000/api/v1/guitars/create-onetime-checkout-session', {
+        items: isCartCheckout ? cartItems.map(item => ({
+          name: item.guitar?.name || 'Guitar',
+          price: item.guitar?.price || 0,
+          quantity: item.quantity,
+          brand: item.guitar?.brand || 'GuitarHaus'
+        })) : [{
+          name: packageData?.name || 'Guitar',
+          price: packageData?.price || 0,
+          quantity: formData.tickets,
+          brand: packageData?.brand || 'GuitarHaus'
+        }],
+        totalAmount: totalAmount,
+        customerInfo: {
+          name: formData.fullName,
+          email: formData.email,
+          phone: formData.phone
+        }
+      });
+
+      console.log('Stripe response:', response.data);
+
+      // Redirect to Stripe checkout
+      if (response.data.success && response.data.url) {
+        window.location.href = response.data.url;
+      } else {
+        throw new Error('Failed to create payment session');
+      }
+    } catch (error) {
+      console.error('Stripe checkout error:', error);
+      
+      let errorMessage = 'Payment failed. Please try again.';
+      
+      if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setError(errorMessage);
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) return <p className="text-center py-10 text-lg">Loading checkout details...</p>;
@@ -334,10 +371,10 @@ const Checkout = () => {
                 {/* Payment Button */}
                 <button
                   type="button"
-                  onClick={handleEsewaPay}
-                  className="w-full bg-gradient-to-r from-green-500 to-green-700 text-white py-4 rounded-lg text-lg font-bold hover:from-green-600 hover:to-green-800 transition duration-300 shadow-lg flex items-center justify-center gap-3 mt-4"
+                  onClick={handleStripePay}
+                  className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-lg text-lg font-bold hover:from-blue-600 hover:to-purple-700 transition duration-300 shadow-lg flex items-center justify-center gap-3 mt-4"
                 >
-                  <FaCreditCard size={20} /> Pay with eSewa
+                  <FaCreditCard size={20} /> Buy with Stripe
                 </button>
               </form>
             </div>

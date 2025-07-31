@@ -1,4 +1,4 @@
-import { Bell, LogOut, User } from "lucide-react";
+import { LogOut, User } from "lucide-react";
 import React from "react";
 
 const Navbar = () => {
@@ -9,12 +9,6 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-6">
-        {/* Notifications Icon */}
-        <button className="relative p-2 rounded-full hover:bg-gray-800">
-          <Bell size={20} />
-          <span className="absolute top-0 right-0 bg-red-500 text-xs text-white px-1.5 py-0.5 rounded-full">3</span>
-        </button>
-
         {/* User Profile Dropdown */}
         <div className="relative group">
           <button className="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-800">

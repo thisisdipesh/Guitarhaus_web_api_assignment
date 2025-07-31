@@ -8,10 +8,12 @@ const {
   updateReview,
   deleteReview,
   getUserReviews,
-  getAllReviews
+  getAllReviews,
+  getPublicReviews
 } = require("../controllers/ReviewController");
 
 // Public routes
+router.get("/", getPublicReviews);
 router.get("/guitar/:guitarId", getGuitarReviews);
 
 // Protected routes

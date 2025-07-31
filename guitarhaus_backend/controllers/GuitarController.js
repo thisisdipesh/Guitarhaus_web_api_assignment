@@ -1,7 +1,15 @@
 const asyncHandler = require("../middleware/async");
 const Guitar = require("../models/Guitar");
 const { protect, authorize } = require("../middleware/auth");
+
+// Debug Stripe configuration
+console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY ? 'Loaded' : 'NOT LOADED');
+console.log('Stripe Secret Key (first 10 chars):', process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) + '...' : 'NOT FOUND');
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const Customer = require("../models/Customer"); // Added for webhook
+const Order = require("../models/Order"); // Added for webhook
+const Cart = require("../models/Cart"); // Added for webhook
 
 // @desc    Get all guitars
 // @route   GET /api/v1/guitars
@@ -308,37 +316,37 @@ exports.createStripeProduct = async (req, res) => {
     if (!name || !description || !price || !category || !brand || !stock) {
       return res.status(400).json({ error: 'Name, description, price, category, brand, and stock are required.' });
     }
+    
     // 1. Create product in Stripe
     const product = await stripe.products.create({
       name,
       description,
+      metadata: {
+        category,
+        brand,
+        stock: stock.toString()
+      }
     });
-    // 2. Create price in Stripe
+    
+    // 2. Create price in Stripe (one-time payment, not subscription)
     const stripePrice = await stripe.prices.create({
-      unit_amount: price, // price in cents
-      currency: 'usd',
-      recurring: { interval: 'month' },
+      unit_amount: Math.round(price), // price in cents
+      currency: 'inr', // Use INR for Indian Rupees
       product: product.id,
     });
-    // 3. Save product in your DB
-    const newProduct = new Guitar({
-      name,
-      description,
-      price,
-      category,
-      brand,
-      stock,
-      specifications: specifications ? JSON.parse(specifications) : {},
+    
+    // 3. Return Stripe IDs only (don't save to DB here)
+    res.status(201).json({
+      message: 'Stripe product and price created successfully',
       stripeProductId: product.id,
       stripePriceId: stripePrice.id,
     });
-    await newProduct.save();
-    res.status(201).json({
-      message: 'Product created in Stripe and local DB',
-      product: newProduct,
-    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Stripe product creation error:', error);
+    res.status(500).json({ 
+      error: 'Failed to create Stripe product',
+      details: error.message 
+    });
   }
 }; 
 
@@ -365,6 +373,87 @@ exports.createCheckoutSession = async (req, res) => {
   }
 }; 
 
+// Create checkout session for one-time payments
+exports.createOneTimeCheckoutSession = async (req, res) => {
+  try {
+    const { items, totalAmount, customerInfo } = req.body;
+    
+    console.log('Creating Stripe checkout session with:', { items, totalAmount, customerInfo });
+    
+    if (!items || !totalAmount) {
+      return res.status(400).json({ 
+        success: false,
+        error: 'Items and total amount are required' 
+      });
+    }
+
+    // Validate Stripe configuration
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('Stripe secret key not configured');
+      return res.status(500).json({ 
+        success: false,
+        error: 'Payment system not configured properly' 
+      });
+    }
+
+    // Create line items for Stripe
+    const lineItems = items.map(item => ({
+      price_data: {
+        currency: 'inr',
+        product_data: {
+          name: item.name || 'Guitar',
+          description: `Brand: ${item.brand || 'GuitarHaus'}`,
+        },
+        unit_amount: Math.round((item.price || 0) * 100), // Convert to cents
+      },
+      quantity: item.quantity || 1,
+    }));
+
+    console.log('Stripe line items:', lineItems);
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: 'http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:5173/cancel',
+      customer_email: customerInfo?.email,
+      metadata: {
+        customer_name: customerInfo?.name || '',
+        customer_phone: customerInfo?.phone || '',
+        total_amount: totalAmount.toString(),
+      },
+    });
+
+    console.log('Stripe session created:', session.id);
+
+    res.json({ 
+      success: true,
+      url: session.url 
+    });
+  } catch (error) {
+    console.error('Stripe checkout session error:', error);
+    
+    // Provide more specific error messages
+    let errorMessage = 'Payment processing failed';
+    
+    if (error.type === 'StripeCardError') {
+      errorMessage = 'Card error: ' + error.message;
+    } else if (error.type === 'StripeInvalidRequestError') {
+      errorMessage = 'Invalid payment request';
+    } else if (error.type === 'StripeAPIError') {
+      errorMessage = 'Payment service error';
+    } else if (error.message) {
+      errorMessage = error.message;
+    }
+    
+    res.status(500).json({ 
+      success: false,
+      error: errorMessage 
+    });
+  }
+}; 
+
 exports.getStripeSession = async (req, res) => {
   try {
     const { session_id } = req.params;
@@ -372,5 +461,104 @@ exports.getStripeSession = async (req, res) => {
     res.json({ status: session.payment_status, session });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+}; 
+
+// Handle Stripe webhook for successful payments
+exports.handleStripeWebhook = async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || 'whsec_test_secret';
+
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (err) {
+    console.error('Webhook signature verification failed:', err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Handle the event
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object;
+      await handleSuccessfulPayment(session);
+      break;
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  res.json({ received: true });
+};
+
+// Handle successful payment and create order
+const handleSuccessfulPayment = async (session) => {
+  try {
+    console.log('Processing successful payment for session:', session.id);
+    
+    const { customer_email, metadata } = session;
+    const { customer_name, customer_phone, total_amount } = metadata;
+    
+    // Find or create customer
+    let customer = await Customer.findOne({ email: customer_email });
+    
+    if (!customer) {
+      // Create new customer if doesn't exist
+      customer = await Customer.create({
+        fname: customer_name.split(' ')[0] || customer_name,
+        lname: customer_name.split(' ').slice(1).join(' ') || '',
+        email: customer_email,
+        phone: parseInt(customer_phone) || 0,
+        password: 'temp_password_' + Math.random().toString(36).substr(2, 9), // Temporary password
+        role: 'customer'
+      });
+    }
+
+    // Get line items from session
+    const lineItems = session.line_items?.data || [];
+    
+    // Create order items
+    const orderItems = [];
+    for (const item of lineItems) {
+      // Try to find guitar by name (since we don't have guitar ID in metadata)
+      const guitar = await Guitar.findOne({ name: item.description?.replace('Brand: ', '') || item.description });
+      
+      if (guitar) {
+        orderItems.push({
+          guitar: guitar._id,
+          quantity: item.quantity,
+          price: item.amount_total / 100 // Convert from cents
+        });
+      }
+    }
+
+    // Create order
+    const order = await Order.create({
+      customer: customer._id,
+      items: orderItems,
+      totalAmount: parseFloat(total_amount),
+      orderStatus: 'pending', // Will be approved by admin
+      paymentStatus: 'paid',
+      paymentMethod: 'stripe',
+      paymentId: session.payment_intent,
+      shippingAddress: {
+        fullName: customer_name,
+        email: customer_email,
+        phone: customer_phone
+      }
+    });
+
+    console.log('Order created successfully:', order._id);
+    
+    // Clear cart if customer was logged in
+    if (customer._id) {
+      await Cart.findOneAndUpdate(
+        { customer: customer._id },
+        { $set: { items: [] } }
+      );
+    }
+
+  } catch (error) {
+    console.error('Error processing successful payment:', error);
   }
 }; 

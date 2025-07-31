@@ -10,7 +10,11 @@ const orderSchema = new mongoose.Schema({
     guitar: { 
       type: mongoose.Schema.Types.ObjectId, 
       ref: "Guitar", 
-      required: true 
+      required: false  // Make it optional
+    },
+    name: {
+      type: String,
+      required: true
     },
     quantity: { 
       type: Number, 

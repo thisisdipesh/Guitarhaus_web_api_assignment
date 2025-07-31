@@ -19,6 +19,11 @@ dotenv.config({
     path: "./config/config.env",
 });
 
+// Debug environment variables
+console.log('Environment loaded from:', "./config/config.env");
+console.log('Stripe Secret Key loaded:', process.env.STRIPE_SECRET_KEY ? 'YES' : 'NO');
+console.log('Stripe Secret Key starts with:', process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 20) + '...' : 'NOT FOUND');
+
 // Connect to database
 connectDB();
 
@@ -35,6 +40,9 @@ const admin = require("./routes/AdminRoute");
 // Body parser
 app.use(express.json());
 app.use(cookieParser());
+
+// Raw body for Stripe webhooks
+app.use('/api/v1/guitars/webhook', express.raw({ type: 'application/json' }));
 
 app.use(bodyParser.json({}));
 app.use(bodyParser.urlencoded({ extended: true }));

@@ -8,8 +8,12 @@ const {
   getOrder,
   getAllOrders,
   updateOrderStatus,
-  cancelOrder
+  cancelOrder,
+  createOrderFromStripe
 } = require("../controllers/OrderController");
+
+// Public route for Stripe order creation (no auth required)
+router.post("/create-from-stripe", createOrderFromStripe);
 
 // User routes
 router.use(protect);

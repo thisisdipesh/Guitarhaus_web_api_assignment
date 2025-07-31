@@ -1,9 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { FaTrash, FaShoppingCart, FaCreditCard, FaGuitar, FaCrown, FaStar } from "react-icons/fa";
+import { FaTrash, FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import Footer from "../common/customer/Footer";
 import Navbar from "../common/customer/Navbar";
 import axios from "axios";
+
+// Import local guitar images for fallback
+import guitar1 from '/src/assets/images/guitar_homepage.jpg';
+import guitar2 from '/src/assets/images/guitar2.jpg';
+import guitar3 from '/src/assets/images/guitar3.jpg';
+import guitar4 from '/src/assets/images/guitar4.jpg';
+import guitar5 from '/src/assets/images/guitar5.jpg';
+
+const guitarImages = [guitar1, guitar2, guitar3, guitar4, guitar5];
 
 const MyCart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -127,106 +136,98 @@ const MyCart = () => {
     <>
       <Navbar />
       
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 py-12">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <FaShoppingCart className="text-yellow-700" size={32} />
-            <h1 className="text-4xl font-bold text-yellow-900">My Cart</h1>
-          </div>
-          <p className="text-center text-yellow-800 text-lg">Review your selected guitars and proceed to checkout</p>
+      <div className="container mx-auto px-6 py-8">
+        <div className="flex items-center gap-3 mb-6">
+          <FaShoppingCart className="text-yellow-600" size={24} />
+          <h1 className="text-3xl font-bold text-gray-800">My Cart</h1>
         </div>
-      </div>
-
-      <div className="container mx-auto px-6 py-12">
+        
         {error ? (
           <div className="text-center py-12">
             <p className="text-red-500 text-lg">{error}</p>
             <button 
               onClick={() => navigate('/login')}
-              className="mt-4 bg-yellow-500 text-black px-6 py-2 rounded-lg hover:bg-yellow-600 transition duration-300"
+              className="mt-4 bg-yellow-500 text-black px-6 py-2 rounded hover:bg-yellow-600 transition duration-300"
             >
               Login
             </button>
           </div>
         ) : cartItems.length > 0 ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <FaGuitar size={24} />
+            <div className="md:col-span-1">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200">
+                <div className="bg-yellow-500 p-4 rounded-t-lg">
+                  <h2 className="text-xl font-bold text-white">
                     Cart Items ({cartItems.length})
                   </h2>
                 </div>
                 
-                <div className="p-6">
-                  <div className="space-y-6">
+                <div className="p-4">
+                  <div className="space-y-4">
                     {cartItems.map((item) => (
-                      <div key={item._id} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                        <div className="flex items-start space-x-4">
+                      <div key={item._id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center space-x-4">
                           {/* Guitar Image */}
                           <img
                             src={item.guitar && item.guitar.images && item.guitar.images.length > 0 
                               ? `http://localhost:3000/uploads/${item.guitar.images[0]}` 
-                              : "https://via.placeholder.com/150"
+                              : guitarImages[Math.floor(Math.random() * guitarImages.length)]
                             }
                             alt={item.guitar ? item.guitar.name : "Guitar"}
-                            className="w-24 h-24 object-cover rounded-lg"
+                            className="w-20 h-20 object-cover rounded"
+                            onError={(e) => {
+                              e.target.src = guitarImages[Math.floor(Math.random() * guitarImages.length)];
+                            }}
                           />
                           
                           {/* Guitar Details */}
                           <div className="flex-grow">
-                            <h3 className="text-xl font-semibold text-gray-800 mb-2">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">
                               {item.guitar ? item.guitar.name : "Guitar"}
                             </h3>
-                            <div className="space-y-1 text-gray-600">
-                              <div className="flex items-center gap-2">
-                                <FaCrown className="text-yellow-600" size={14} />
-                                <span>Brand: {item.guitar ? item.guitar.brand : "-"}</span>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <FaStar className="text-yellow-600" size={14} />
-                                <span>Price: ₹{item.guitar ? item.guitar.price : "-"}</span>
-                              </div>
-                            </div>
+                            <p className="text-gray-600 mb-1">
+                              Brand: {item.guitar ? item.guitar.brand : "Unknown"}
+                            </p>
+                            <p className="text-gray-600">
+                              Price: ₹{item.price ? item.price.toLocaleString() : "0"}
+                            </p>
                           </div>
                           
-                          {/* Quantity and Actions */}
-                          <div className="flex flex-col items-end space-y-3">
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleUpdateQuantity(item._id, Math.max(1, item.quantity - 1))}
-                                className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition duration-200"
-                              >
-                                -
-                              </button>
-                              <span className="w-12 text-center font-semibold">{item.quantity}</span>
-                              <button
-                                onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}
-                                className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition duration-200"
-                              >
-                                +
-                              </button>
-                            </div>
-                            
+                          {/* Quantity Controls */}
+                          <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => handleRemoveItem(item._id)}
-                              disabled={removingItem === item._id}
-                              className="text-red-500 hover:text-red-700 transition duration-200 flex items-center gap-1 disabled:opacity-50"
+                              onClick={() => handleUpdateQuantity(item._id, Math.max(1, item.quantity - 1))}
+                              className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300"
                             >
-                              <FaTrash size={14} />
-                              {removingItem === item._id ? "Removing..." : "Remove"}
+                              -
+                            </button>
+                            <span className="w-8 text-center font-semibold">{item.quantity}</span>
+                            <button
+                              onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}
+                              className="w-8 h-8 bg-gray-200 rounded flex items-center justify-center hover:bg-gray-300"
+                            >
+                              +
                             </button>
                           </div>
+                          
+                          {/* Remove Button */}
+                          <button
+                            onClick={() => handleRemoveItem(item._id)}
+                            disabled={removingItem === item._id}
+                            className="text-red-500 hover:text-red-700 disabled:opacity-50"
+                          >
+                            <FaTrash size={16} />
+                          </button>
                         </div>
                         
                         {/* Item Total */}
-                        <div className="mt-4 pt-4 border-t border-gray-200">
+                        <div className="mt-3 pt-3 border-t border-gray-200">
                           <div className="flex justify-between items-center">
                             <span className="text-gray-600">Item Total:</span>
-                            <span className="text-lg font-bold text-yellow-700">₹{item.price * item.quantity}</span>
+                            <span className="font-bold text-yellow-600">
+                              ₹{(item.price * item.quantity).toLocaleString()}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -237,20 +238,19 @@ const MyCart = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-xl overflow-hidden sticky top-8">
-                <div className="bg-gradient-to-r from-yellow-600 to-yellow-700 p-6">
-                  <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-                    <FaCreditCard size={24} />
+            <div className="md:col-span-1">
+              <div className="bg-white rounded-lg shadow-md border border-gray-200">
+                <div className="bg-yellow-500 p-4 rounded-t-lg">
+                  <h2 className="text-xl font-bold text-white">
                     Order Summary
                   </h2>
                 </div>
                 
-                <div className="p-6">
-                  <div className="space-y-4">
+                <div className="p-4">
+                  <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Subtotal:</span>
-                      <span className="font-semibold">₹{calculateTotal()}</span>
+                      <span className="font-semibold">₹{calculateTotal().toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Shipping:</span>
@@ -259,15 +259,14 @@ const MyCart = () => {
                     <hr className="border-gray-200" />
                     <div className="flex justify-between items-center text-lg font-bold">
                       <span>Total:</span>
-                      <span className="text-yellow-700">₹{calculateTotal()}</span>
+                      <span className="text-yellow-600">₹{calculateTotal().toLocaleString()}</span>
                     </div>
                   </div>
                   
                   <button
                     onClick={handleCheckout}
-                    className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-4 rounded-lg text-lg font-bold hover:from-yellow-600 hover:to-yellow-700 transition duration-300 shadow-lg flex items-center justify-center gap-3 mt-6"
+                    className="w-full bg-yellow-500 text-white py-3 rounded text-lg font-bold hover:bg-yellow-600 transition duration-300 mt-4"
                   >
-                    <FaCreditCard size={20} />
                     Proceed to Checkout
                   </button>
                 </div>
@@ -276,12 +275,12 @@ const MyCart = () => {
           </div>
         ) : (
           <div className="text-center py-12">
-            <FaShoppingCart className="text-gray-400 mx-auto mb-4" size={64} />
+            <FaShoppingCart className="text-gray-400 mx-auto mb-4" size={48} />
             <h2 className="text-2xl font-bold text-gray-600 mb-2">Your cart is empty</h2>
             <p className="text-gray-500 mb-6">Add some guitars to get started!</p>
             <button
               onClick={() => navigate('/guitars')}
-              className="bg-yellow-500 text-black px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-300"
+              className="bg-yellow-500 text-black px-6 py-2 rounded font-semibold hover:bg-yellow-600 transition duration-300"
             >
               Browse Guitars
             </button>

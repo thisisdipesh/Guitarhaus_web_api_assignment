@@ -66,7 +66,7 @@ const AddPackages = () => {
           {
             name: formData.name,
             description: formData.description,
-            price: Math.round(Number(formData.price) * 100), // convert to cents
+            price: Math.round(Number(formData.price) * 100), // convert to cents for Stripe
             category: formData.category,
             brand: formData.brand,
             stock: formData.stock,
@@ -76,8 +76,8 @@ const AddPackages = () => {
             headers: { Authorization: `Bearer ${token}` }
           }
         );
-        stripeProductId = res.data.product.stripeProductId || res.data.product.stripeProductId;
-        stripePriceId = res.data.product.stripePriceId || res.data.product.stripePriceId;
+        stripeProductId = res.data.stripeProductId;
+        stripePriceId = res.data.stripePriceId;
         setStripeSuccess("Stripe product created successfully! Stripe Product ID: " + stripeProductId);
       }
       // Now upload the rest (image, etc.)

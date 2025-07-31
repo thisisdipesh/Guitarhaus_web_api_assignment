@@ -93,8 +93,8 @@ exports.updateReview = asyncHandler(async (req, res, next) => {
     });
   }
 
-  // Check if user owns this review
-  if (review.customer.toString() !== req.user.id) {
+  // Check if user owns this review or is admin
+  if (review.customer.toString() !== req.user.id && req.user.role !== 'admin') {
     return res.status(403).json({
       success: false,
       message: "Access denied"
@@ -149,15 +149,19 @@ exports.deleteReview = asyncHandler(async (req, res, next) => {
     });
   }
 
-  await review.remove();
+  // Store guitar ID before deleting
+  const guitarId = review.guitar;
+
+  // Delete the review
+  await Review.findByIdAndDelete(req.params.id);
 
   // Update guitar rating
-  const reviews = await Review.find({ guitar: review.guitar });
+  const reviews = await Review.find({ guitar: guitarId });
   const avgRating = reviews.length > 0 
     ? reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length 
     : 0;
 
-  await Guitar.findByIdAndUpdate(review.guitar, {
+  await Guitar.findByIdAndUpdate(guitarId, {
     rating: avgRating,
     numReviews: reviews.length
   });
@@ -196,6 +200,21 @@ exports.getAllReviews = asyncHandler(async (req, res, next) => {
       message: "Access denied. Admins only."
     });
   }
+  const reviews = await Review.find()
+    .populate({ path: 'customer', select: 'fname lname' })
+    .populate({ path: 'guitar', select: 'name brand price images' })
+    .sort('-createdAt');
+  res.status(200).json({
+    success: true,
+    count: reviews.length,
+    data: reviews
+  });
+});
+
+// @desc    Get all reviews (Public)
+// @route   GET /api/v1/reviews
+// @access  Public
+exports.getPublicReviews = asyncHandler(async (req, res, next) => {
   const reviews = await Review.find()
     .populate({ path: 'customer', select: 'fname lname' })
     .populate({ path: 'guitar', select: 'name brand price images' })
