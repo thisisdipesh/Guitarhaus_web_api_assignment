@@ -30,6 +30,7 @@ const orders = require("./routes/OrderRoute");
 const wishlist = require("./routes/WishlistRoute");
 const reviews = require("./routes/ReviewRoute");
 const payments = require("./routes/PaymentRoute");
+const admin = require("./routes/AdminRoute");
 
 // Body parser
 app.use(express.json());
@@ -85,6 +86,7 @@ app.use("/api/v1/orders", orders);
 app.use("/api/v1/wishlist", wishlist);
 app.use("/api/v1/reviews", reviews);
 app.use("/api/v1/payments", payments);
+app.use("/api/v1/admin", admin);
 
 const PORT = process.env.PORT || 3000;
 
