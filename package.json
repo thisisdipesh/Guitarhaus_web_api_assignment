@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "jest-environment-jsdom": "^30.0.4"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "stripe": "^18.3.0"
+  }
+}

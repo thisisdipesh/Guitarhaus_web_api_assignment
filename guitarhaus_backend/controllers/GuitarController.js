@@ -1,0 +1,376 @@
+const asyncHandler = require("../middleware/async");
+const Guitar = require("../models/Guitar");
+const { protect, authorize } = require("../middleware/auth");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+
+// @desc    Get all guitars
+// @route   GET /api/v1/guitars
+// @access  Public
+exports.getGuitars = asyncHandler(async (req, res, next) => {
+  const page = parseInt(req.query.page, 10) || 1;
+  const limit = parseInt(req.query.limit, 10) || 10;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  const total = await Guitar.countDocuments();
+
+  let query = Guitar.find();
+
+  // Filter by category
+  if (req.query.category) {
+    query = query.find({ category: req.query.category });
+  }
+
+  // Filter by brand
+  if (req.query.brand) {
+    query = query.find({ brand: req.query.brand });
+  }
+
+  // Filter by price range
+  if (req.query.minPrice || req.query.maxPrice) {
+    const priceFilter = {};
+    if (req.query.minPrice) priceFilter.$gte = parseFloat(req.query.minPrice);
+    if (req.query.maxPrice) priceFilter.$lte = parseFloat(req.query.maxPrice);
+    query = query.find({ price: priceFilter });
+  }
+
+  // Filter by availability
+  if (req.query.available) {
+    query = query.find({ isAvailable: req.query.available === 'true' });
+  }
+
+  // Search functionality
+  if (req.query.search) {
+    query = query.find({
+      $text: { $search: req.query.search }
+    });
+  }
+
+  // Sort
+  if (req.query.sort) {
+    const sortBy = req.query.sort.split(',');
+    const sortOrder = {};
+    sortBy.forEach(item => {
+      const [field, order] = item.split(':');
+      sortOrder[field] = order === 'desc' ? -1 : 1;
+    });
+    query = query.sort(sortOrder);
+  } else {
+    query = query.sort('-createdAt');
+  }
+
+  query = query.skip(startIndex).limit(limit);
+
+  const guitars = await query;
+
+  // Pagination result
+  const pagination = {};
+
+  if (endIndex < total) {
+    pagination.next = {
+      page: page + 1,
+      limit
+    };
+  }
+
+  if (startIndex > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit
+    };
+  }
+
+  res.status(200).json({
+    success: true,
+    count: guitars.length,
+    pagination,
+    data: guitars
+  });
+});
+
+// @desc    Get single guitar
+// @route   GET /api/v1/guitars/:id
+// @access  Public
+exports.getGuitar = asyncHandler(async (req, res, next) => {
+  const guitar = await Guitar.findById(req.params.id);
+
+  if (!guitar) {
+    return res.status(404).json({ 
+      success: false, 
+      message: `Guitar not found with id ${req.params.id}` 
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: guitar
+  });
+});
+
+// @desc    Create new guitar
+// @route   POST /api/v1/guitars
+// @access  Private (Admin only)
+exports.createGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Create Guitar - User:', req.user);
+  console.log('Create Guitar - Request body:', req.body);
+  console.log('Create Guitar - File:', req.file);
+  console.log('Create Guitar - Headers:', req.headers);
+  console.log('Create Guitar - Content-Type:', req.headers['content-type']);
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ 
+      success: false, 
+      message: "Access denied. Admins only." 
+    });
+  }
+
+  // Handle uploaded image
+  if (req.file) {
+    req.body.images = [req.file.filename];
+    console.log('Image uploaded:', req.file.filename);
+  } else {
+    req.body.images = [];
+    console.log('No image uploaded');
+  }
+
+  // Handle specifications object
+  if (req.body.specifications) {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+      console.log('Specifications parsed:', req.body.specifications);
+    } catch (error) {
+      console.error('Error parsing specifications:', error);
+    }
+  }
+
+  // Ensure price and stock are numbers
+  if (req.body.price) req.body.price = Number(req.body.price);
+  if (req.body.stock) req.body.stock = Number(req.body.stock);
+
+  console.log('Final request body:', req.body);
+
+  const guitar = await Guitar.create(req.body);
+
+  console.log('Guitar created:', guitar);
+
+  res.status(201).json({
+    success: true,
+    data: guitar
+  });
+});
+
+// @desc    Update guitar
+// @route   PUT /api/v1/guitars/:id
+// @access  Private (Admin only)
+exports.updateGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Update Guitar - User:', req.user);
+  console.log('Update Guitar - Request body:', req.body);
+  console.log('Update Guitar - File:', req.file);
+  console.log('Update Guitar - ID:', req.params.id);
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ 
+      success: false, 
+      message: "Access denied. Admins only." 
+    });
+  }
+
+  let guitar = await Guitar.findById(req.params.id);
+
+  if (!guitar) {
+    return res.status(404).json({ 
+      success: false, 
+      message: `Guitar not found with id ${req.params.id}` 
+    });
+  }
+
+  // Handle uploaded image
+  if (req.file) {
+    req.body.images = [req.file.filename];
+    console.log('New image uploaded:', req.file.filename);
+  }
+
+  // Handle specifications object
+  if (req.body.specifications) {
+    try {
+      req.body.specifications = JSON.parse(req.body.specifications);
+      console.log('Specifications parsed:', req.body.specifications);
+    } catch (error) {
+      console.error('Error parsing specifications:', error);
+    }
+  }
+
+  // Ensure price and stock are numbers
+  if (req.body.price) req.body.price = Number(req.body.price);
+  if (req.body.stock) req.body.stock = Number(req.body.stock);
+
+  console.log('Final update body:', req.body);
+
+  guitar = await Guitar.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
+
+  console.log('Guitar updated:', guitar);
+
+  res.status(200).json({
+    success: true,
+    data: guitar
+  });
+});
+
+// @desc    Delete guitar
+// @route   DELETE /api/v1/guitars/:id
+// @access  Private (Admin only)
+exports.deleteGuitar = asyncHandler(async (req, res, next) => {
+  console.log('Delete Guitar - User:', req.user);
+  console.log('Delete Guitar - ID:', req.params.id);
+
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ 
+      success: false, 
+      message: "Access denied. Admins only." 
+    });
+  }
+
+  const guitar = await Guitar.findById(req.params.id);
+
+  if (!guitar) {
+    return res.status(404).json({ 
+      success: false, 
+      message: `Guitar not found with id ${req.params.id}` 
+    });
+  }
+
+  // Use findByIdAndDelete instead of remove() (which is deprecated)
+  await Guitar.findByIdAndDelete(req.params.id);
+
+  console.log('Guitar deleted successfully:', req.params.id);
+
+  res.status(200).json({
+    success: true,
+    message: "Guitar deleted successfully"
+  });
+});
+
+// @desc    Get featured guitars
+// @route   GET /api/v1/guitars/featured
+// @access  Public
+exports.getFeaturedGuitars = asyncHandler(async (req, res, next) => {
+  const guitars = await Guitar.find({ isFeatured: true }).limit(10);
+
+  res.status(200).json({
+    success: true,
+    count: guitars.length,
+    data: guitars
+  });
+});
+
+// @desc    Get guitars by category
+// @route   GET /api/v1/guitars/category/:category
+// @access  Public
+exports.getGuitarsByCategory = asyncHandler(async (req, res, next) => {
+  const guitars = await Guitar.find({ category: req.params.category });
+
+  res.status(200).json({
+    success: true,
+    count: guitars.length,
+    data: guitars
+  });
+});
+
+// @desc    Search guitars
+// @route   GET /api/v1/guitars/search
+// @access  Public
+exports.searchGuitars = asyncHandler(async (req, res, next) => {
+  const { q } = req.query;
+
+  if (!q) {
+    return res.status(400).json({
+      success: false,
+      message: "Search query is required"
+    });
+  }
+
+  const guitars = await Guitar.find({
+    $text: { $search: q }
+  });
+
+  res.status(200).json({
+    success: true,
+    count: guitars.length,
+    data: guitars
+  });
+}); 
+
+exports.createStripeProduct = async (req, res) => {
+  try {
+    const { name, description, price, category, brand, stock, specifications } = req.body;
+    if (!name || !description || !price || !category || !brand || !stock) {
+      return res.status(400).json({ error: 'Name, description, price, category, brand, and stock are required.' });
+    }
+    // 1. Create product in Stripe
+    const product = await stripe.products.create({
+      name,
+      description,
+    });
+    // 2. Create price in Stripe
+    const stripePrice = await stripe.prices.create({
+      unit_amount: price, // price in cents
+      currency: 'usd',
+      recurring: { interval: 'month' },
+      product: product.id,
+    });
+    // 3. Save product in your DB
+    const newProduct = new Guitar({
+      name,
+      description,
+      price,
+      category,
+      brand,
+      stock,
+      specifications: specifications ? JSON.parse(specifications) : {},
+      stripeProductId: product.id,
+      stripePriceId: stripePrice.id,
+    });
+    await newProduct.save();
+    res.status(201).json({
+      message: 'Product created in Stripe and local DB',
+      product: newProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 
+
+exports.createCheckoutSession = async (req, res) => {
+  try {
+    const { priceId } = req.body;
+    if (!priceId) {
+      return res.status(400).json({ error: 'Price ID is required' });
+    }
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: 'http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:5173/cancel',
+    });
+    res.json({ url: session.url });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 
+
+exports.getStripeSession = async (req, res) => {
+  try {
+    const { session_id } = req.params;
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    res.json({ status: session.payment_status, session });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 
