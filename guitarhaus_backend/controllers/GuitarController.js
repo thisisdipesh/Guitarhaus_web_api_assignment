@@ -1,6 +1,7 @@
 const asyncHandler = require("../middleware/async");
 const Guitar = require("../models/Guitar");
 const { protect, authorize } = require("../middleware/auth");
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51Rq87wC14naaUubxL5JsBvTs4udmprArc4llpFT8UPZu3dodo6OUKvemNeMsYGdbmA4wKo5uzAivdAgiHFYmtjA600WV6M6Dxz');
 
 // @desc    Get all guitars
 // @route   GET /api/v1/guitars
@@ -300,3 +301,76 @@ exports.searchGuitars = asyncHandler(async (req, res, next) => {
     data: guitars
   });
 }); 
+
+exports.createStripeProduct = async (req, res) => {
+  try {
+    const { name, description, price, category, brand, stock, specifications } = req.body;
+    if (!name || !description || !price || !category || !brand || !stock) {
+      return res.status(400).json({ error: 'Name, description, price, category, brand, and stock are required.' });
+    }
+    // 1. Create product in Stripe
+    const product = await stripe.products.create({
+      name,
+      description,
+    });
+    // 2. Create price in Stripe
+    const stripePrice = await stripe.prices.create({
+      unit_amount: price, // price in cents
+      currency: 'usd',
+      recurring: { interval: 'month' },
+      product: product.id,
+    });
+    // 3. Save product in your DB
+    const newProduct = new Guitar({
+      name,
+      description,
+      price,
+      category,
+      brand,
+      stock,
+      specifications: specifications ? JSON.parse(specifications) : {},
+      stripeProductId: product.id,
+      stripePriceId: stripePrice.id,
+    });
+    await newProduct.save();
+    res.status(201).json({
+      message: 'Product created in Stripe and local DB',
+      product: newProduct,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 
+
+exports.createCheckoutSession = async (req, res) => {
+  try {
+    const { priceId } = req.body;
+    if (!priceId) {
+      return res.status(400).json({ error: 'Price ID is required' });
+    }
+    const session = await stripe.checkout.sessions.create({
+      line_items: [
+        {
+          price: priceId,
+          quantity: 1,
+        },
+      ],
+      mode: 'subscription',
+      success_url: 'http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:5173/cancel',
+    });
+    res.json({ url: session.url });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 
+
+exports.getStripeSession = async (req, res) => {
+  try {
+    const { session_id } = req.params;
+    const session = await stripe.checkout.sessions.retrieve(session_id);
+    res.json({ status: session.payment_status, session });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}; 

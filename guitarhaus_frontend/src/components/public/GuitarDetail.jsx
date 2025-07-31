@@ -124,6 +124,21 @@ const PackageDetail = () => {
     }
   };
 
+  const handleBuyNow = async () => {
+    if (!packageData?.stripePriceId) {
+      alert('Stripe price not available for this product.');
+      return;
+    }
+    try {
+      const res = await axios.post('http://localhost:3000/api/v1/guitars/create-checkout-session', {
+        priceId: packageData.stripePriceId,
+      });
+      window.location.href = res.data.url;
+    } catch (err) {
+      alert('Error creating Stripe checkout session.');
+    }
+  };
+
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     setReviewError("");
@@ -229,6 +244,14 @@ const PackageDetail = () => {
                 <FaGuitar size={20} />
                 {addingToCart ? "Adding to Cart..." : "Add to Cart"}
               </button>
+              {packageData?.stripePriceId && (
+                <button
+                  onClick={handleBuyNow}
+                  className="bg-purple-600 text-white px-6 py-2 rounded-lg font-bold mt-4 hover:bg-purple-700 transition"
+                >
+                  Buy Now with Stripe
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -84,7 +84,9 @@ const guitarSchema = new mongoose.Schema(
       weight: { type: Number },
       dimensions: { type: String },
       shippingCost: { type: Number, default: 0 }
-    }
+    },
+    stripeProductId: { type: String },
+    stripePriceId: { type: String }
   },
   { 
     timestamps: true 

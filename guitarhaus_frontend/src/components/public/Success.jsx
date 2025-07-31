@@ -14,17 +14,30 @@ const Success = () => {
   };
 
   useEffect(() => {
-    // Get transaction_uuid and total_amount from query params
+    const session_id = getQueryParam("session_id");
+    if (session_id) {
+      // Stripe payment flow
+      axios
+        .get(`http://localhost:3000/api/v1/guitars/stripe-session/${session_id}`)
+        .then((res) => {
+          setStatus(res.data.status || 'Paid');
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError("Failed to verify Stripe payment.");
+          setLoading(false);
+        });
+      return;
+    }
+    // eSewa fallback
     const transaction_uuid = getQueryParam("transaction_uuid");
     const total_amount = getQueryParam("total_amount");
     const product_code = "EPAYTEST";
-
     if (!transaction_uuid || !total_amount) {
       setError("Missing payment details in URL.");
       setLoading(false);
       return;
     }
-
     axios
       .get(
         `https://rc.esewa.com.np/api/epay/transaction/status/?product_code=${product_code}&total_amount=${total_amount}&transaction_uuid=${transaction_uuid}`
