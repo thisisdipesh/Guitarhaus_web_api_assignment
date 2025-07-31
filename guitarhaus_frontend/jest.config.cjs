@@ -13,4 +13,11 @@ module.exports = {
   transform: {
     '^.+\\.[jt]sx?$': 'babel-jest',
   },
+  testPathIgnorePatterns: ['/node_modules/'],
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx}',
+    '!src/main.jsx',
+    '!src/setupTests.js',
+  ],
+  coverageReporters: ['text', 'lcov', 'html'],
 }; 
