@@ -40,10 +40,10 @@ describe('Authentication System', () => {
         </QueryClientProvider>
       );
 
-      expect(screen.getByText('Welcome Back!')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+      expect(screen.getByText('Login to Your Account')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Enter your email')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /login/i })).toBeInTheDocument();
     });
 
     it('handles successful login', async () => {
@@ -58,17 +58,17 @@ describe('Authentication System', () => {
         </QueryClientProvider>
       );
 
-      fireEvent.change(screen.getByPlaceholderText('Email'), {
+      fireEvent.change(screen.getByPlaceholderText('Enter your email'), {
         target: { value: 'test@example.com' },
       });
-      fireEvent.change(screen.getByPlaceholderText('Password'), {
+      fireEvent.change(screen.getByPlaceholderText('Enter your password'), {
         target: { value: 'password123' },
       });
-      fireEvent.click(screen.getByRole('button', { name: /sign in/i }));
+      fireEvent.click(screen.getByRole('button', { name: /login/i }));
 
       await waitFor(() => {
         expect(axios.post).toHaveBeenCalledWith(
-          'http://localhost:3000/api/v1/auth/login',
+          '/api/v1/customers/login',
           {
             email: 'test@example.com',
             password: 'password123',
@@ -88,13 +88,13 @@ describe('Authentication System', () => {
         </QueryClientProvider>
       );
 
-      expect(screen.getByText('Create Account')).toBeInTheDocument();
+      expect(screen.getByText('Create an Account')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('First Name')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Last Name')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Phone')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Password')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Confirm Password')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('you@example.com')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('123-456-7890')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Confirm your password')).toBeInTheDocument();
     });
 
     it('handles successful registration', async () => {
@@ -115,30 +115,31 @@ describe('Authentication System', () => {
       fireEvent.change(screen.getByPlaceholderText('Last Name'), {
         target: { value: 'Doe' },
       });
-      fireEvent.change(screen.getByPlaceholderText('Email'), {
+      fireEvent.change(screen.getByPlaceholderText('you@example.com'), {
         target: { value: 'john@example.com' },
       });
-      fireEvent.change(screen.getByPlaceholderText('Phone'), {
+      fireEvent.change(screen.getByPlaceholderText('123-456-7890'), {
         target: { value: '1234567890' },
       });
-      fireEvent.change(screen.getByPlaceholderText('Password'), {
+      fireEvent.change(screen.getByPlaceholderText('Enter your password'), {
         target: { value: 'password123' },
       });
-      fireEvent.change(screen.getByPlaceholderText('Confirm Password'), {
+      fireEvent.change(screen.getByPlaceholderText('Confirm your password'), {
         target: { value: 'password123' },
       });
 
-      fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+      fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
       await waitFor(() => {
         expect(axios.post).toHaveBeenCalledWith(
-          'http://localhost:3000/api/v1/auth/register',
+          '/api/v1/customers/register',
           {
-            firstName: 'John',
-            lastName: 'Doe',
+            fname: 'John',
+            lname: 'Doe',
             email: 'john@example.com',
             phone: '1234567890',
             password: 'password123',
+            confirmPassword: 'password123',
           }
         );
       });

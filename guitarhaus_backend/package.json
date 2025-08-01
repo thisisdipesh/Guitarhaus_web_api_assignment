@@ -54,7 +54,8 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^30.0.4",
     "mocha": "^11.1.0",
-    "supertest": "^7.0.0"
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.1.4"
   },
   "overrides": {
     "cross-spawn": "^7.0.5"

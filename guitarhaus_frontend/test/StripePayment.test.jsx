@@ -15,17 +15,15 @@ const localStorageMock = {
 };
 global.localStorage = localStorageMock;
 
-// Mock window.location
-const mockLocation = {
+// Mock window.location without redefining the property
+const originalLocation = window.location;
+delete window.location;
+window.location = {
   search: '',
   href: 'http://localhost:3000/success',
   origin: 'http://localhost:3000',
   pathname: '/success'
 };
-Object.defineProperty(window, 'location', {
-  value: mockLocation,
-  writable: true
-});
 
 describe('Stripe Payment Integration', () => {
   const mockCartItems = [
@@ -47,6 +45,10 @@ describe('Stripe Payment Integration', () => {
     jest.clearAllMocks();
     localStorageMock.getItem.mockReturnValue('test-token');
     window.location.search = '';
+  });
+
+  afterAll(() => {
+    window.location = originalLocation;
   });
 
   describe('Checkout Component', () => {
@@ -119,10 +121,7 @@ describe('Stripe Payment Integration', () => {
   describe('Payment Success Component', () => {
     it('renders success page with session ID', () => {
       // Update the mock location for this test
-      Object.defineProperty(window, 'location', {
-        value: { ...mockLocation, search: '?session_id=test-session-id' },
-        writable: true
-      });
+      window.location.search = '?session_id=test-session-id';
 
       const SuccessComponent = () => (
         <div>

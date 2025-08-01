@@ -178,10 +178,8 @@ describe('User Management', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText('J')).toBeInTheDocument();
-    expect(screen.getByText('S')).toBeInTheDocument();
-    expect(screen.getByText('B')).toBeInTheDocument();
-    expect(screen.getByText('W')).toBeInTheDocument();
+    expect(screen.getByText('JS')).toBeInTheDocument();
+    expect(screen.getByText('BW')).toBeInTheDocument();
   });
 
   it('shows view and delete buttons for each user', () => {
