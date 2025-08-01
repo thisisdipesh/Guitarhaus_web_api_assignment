@@ -32,7 +32,7 @@ const MyCart = () => {
         }
 
         const response = await axios.get(
-          `http://localhost:3000/api/v1/cart`,
+          `/api/v1/cart`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ const MyCart = () => {
     setRemovingItem(itemId);
     try {
       await axios.delete(
-        `http://localhost:3000/api/v1/cart/remove/${itemId}`,
+        `/api/v1/cart/remove/${itemId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -80,7 +80,7 @@ const MyCart = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/v1/cart/update/${itemId}`,
+        `/api/v1/cart/update/${itemId}`,
         { quantity: newQuantity },
         {
           headers: {
@@ -171,7 +171,7 @@ const MyCart = () => {
                           {/* Guitar Image */}
                           <img
                             src={item.guitar && item.guitar.images && item.guitar.images.length > 0 
-                              ? `http://localhost:3000/uploads/${item.guitar.images[0]}` 
+                              ? `http://localhost:5000/uploads/${item.guitar.images[0]}` 
                               : guitarImages[Math.floor(Math.random() * guitarImages.length)]
                             }
                             alt={item.guitar ? item.guitar.name : "Guitar"}

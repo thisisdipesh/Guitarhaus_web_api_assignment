@@ -31,7 +31,7 @@ const PackageDetail = () => {
   useEffect(() => {
     const fetchGuitarDetails = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/v1/guitars/${id}`);
+        const res = await axios.get(`/api/v1/guitars/${id}`);
         setPackageData(res.data.data);
       } catch (err) {
         setError("Failed to load guitar details. Please try again.");
@@ -42,7 +42,7 @@ const PackageDetail = () => {
 
     const fetchWishlistData = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/v1/wishlist`, {
+        const res = await axios.get(`/api/v1/wishlist`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const isInWishlist = res.data.data.some((item) => item.guitar && item.guitar._id === id);
@@ -60,7 +60,7 @@ const PackageDetail = () => {
   // Example: Fetch reviews for this guitar (replace with real API call)
   useEffect(() => {
     // Fetch reviews from backend
-    axios.get(`http://localhost:3000/api/v1/reviews/guitar/${id}`)
+    axios.get(`/api/v1/reviews/guitar/${id}`)
       .then(res => {
         setReviews(res.data.data.map(r => ({
           text: r.comment,
@@ -80,14 +80,14 @@ const PackageDetail = () => {
 
     try {
       if (isFavorite) {
-        const res = await axios.delete(`http://localhost:3000/api/v1/wishlist/remove/${id}`, {
+        const res = await axios.delete(`/api/v1/wishlist/remove/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setIsFavorite(false);
         setWishlistCount(res.data.count);
       } else {
         const res = await axios.post(
-          `http://localhost:3000/api/v1/wishlist/add`,
+          `/api/v1/wishlist/add`,
           { guitarId: id },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -109,7 +109,7 @@ const PackageDetail = () => {
     setAddingToCart(true);
     try {
       await axios.post(
-        `http://localhost:3000/api/v1/cart/add`,
+        `/api/v1/cart/add`,
         { guitarId: id, quantity: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -130,7 +130,7 @@ const PackageDetail = () => {
       return;
     }
     try {
-      const res = await axios.post('http://localhost:3000/api/v1/guitars/create-checkout-session', {
+      const res = await axios.post('/api/v1/guitars/create-checkout-session', {
         priceId: packageData.stripePriceId,
       });
       window.location.href = res.data.url;
@@ -150,7 +150,7 @@ const PackageDetail = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.post(
-        `http://localhost:3000/api/v1/reviews/guitar/${id}`,
+        `/api/v1/reviews/guitar/${id}`,
         {
           rating: reviewRating,
           title: "Review",
@@ -162,7 +162,7 @@ const PackageDetail = () => {
       setReviewRating(5);
       setReviewSuccess("Review submitted!");
       // Refetch reviews
-      axios.get(`http://localhost:3000/api/v1/reviews/guitar/${id}`)
+      axios.get(`/api/v1/reviews/guitar/${id}`)
         .then(res => {
           setReviews(res.data.data.map(r => ({
             text: r.comment,
@@ -184,7 +184,7 @@ const PackageDetail = () => {
   // Get the guitar image from backend or fallback to local images
   const getGuitarImage = () => {
     if (packageData.images && packageData.images.length > 0) {
-      return `http://localhost:3000/uploads/${packageData.images[0]}`;
+      return `http://localhost:5000/uploads/${packageData.images[0]}`;
     }
     // Fallback to local images if no backend image
     return guitarImages[Math.floor(Math.random() * guitarImages.length)];
@@ -244,14 +244,6 @@ const PackageDetail = () => {
                 <FaGuitar size={20} />
                 {addingToCart ? "Adding to Cart..." : "Add to Cart"}
               </button>
-              {packageData?.stripePriceId && (
-                <button
-                  onClick={handleBuyNow}
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg font-bold mt-4 hover:bg-purple-700 transition"
-                >
-                  Buy Now with Stripe
-                </button>
-              )}
             </div>
           </div>
         </div>

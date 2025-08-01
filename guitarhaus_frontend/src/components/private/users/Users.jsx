@@ -95,7 +95,7 @@ const Users = () => {
                     <tr key={user._id} className="border-b last:border-b-0 hover:bg-yellow-50 transition">
                       <td className="px-6 py-4 text-sm font-semibold text-gray-800 flex items-center gap-3">
                         {user.image ? (
-                          <img src={`http://localhost:3000/uploads/${user.image}`} alt={user.fname || user.lname || user.email} className="w-9 h-9 rounded-full border-2 border-yellow-200 shadow" />
+                          <img src={`http://localhost:5000/uploads/${user.image}`} alt={user.fname || user.lname || user.email} className="w-9 h-9 rounded-full border-2 border-yellow-200 shadow" />
                         ) : (
                           <span className="w-9 h-9 rounded-full bg-yellow-200 flex items-center justify-center text-yellow-900 font-bold text-lg border-2 border-yellow-100 shadow">
                             {getInitials(`${user.fname || ""} ${user.lname || ""}`.trim() || user.email)}
@@ -160,7 +160,7 @@ const Users = () => {
                 <div className="text-center">
                   {selectedUser.image ? (
                     <img 
-                      src={`http://localhost:3000/uploads/${selectedUser.image}`} 
+                      src={`http://localhost:5000/uploads/${selectedUser.image}`} 
                       alt={selectedUser.fname || selectedUser.lname || selectedUser.email} 
                       className="w-20 h-20 rounded-full border-4 border-yellow-200 shadow-lg mx-auto mb-4" 
                     />

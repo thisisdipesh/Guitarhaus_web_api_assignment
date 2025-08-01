@@ -32,7 +32,7 @@ const ManageGuitars = () => {
   const fetchGuitars = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:3000/api/v1/guitars");
+      const res = await axios.get("/api/v1/guitars");
       setGuitars(res.data.data || []);
     } catch (error) {
       console.error("Error fetching guitars:", error);
@@ -49,7 +49,7 @@ const ManageGuitars = () => {
       console.log('Deleting guitar with ID:', id);
       console.log('Token:', token ? 'Token exists' : 'No token');
       
-      const response = await axios.delete(`http://localhost:3000/api/v1/guitars/${id}`, {
+              const response = await axios.delete(`/api/v1/guitars/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -85,7 +85,7 @@ const ManageGuitars = () => {
     
     // Set current image preview
     if (guitar.images && guitar.images.length > 0) {
-              setImagePreview(`http://localhost:3000/uploads/${guitar.images[0]}`);
+      setImagePreview(`http://localhost:5000/uploads/${guitar.images[0]}`);
     } else {
       setImagePreview(null);
     }
@@ -154,7 +154,7 @@ const ManageGuitars = () => {
 
       console.log('Sending update request for guitar:', editingGuitar._id);
       const response = await axios.put(
-        `http://localhost:3000/api/v1/guitars/${editingGuitar._id}`,
+        `/api/v1/guitars/${editingGuitar._id}`,
         formData,
         {
           headers: { 
@@ -238,7 +238,16 @@ const ManageGuitars = () => {
                 <tr key={guitar._id} className="border hover:bg-yellow-50 transition">
                   <td className="border p-2">
                     {guitar.images && guitar.images.length > 0 ? (
-                      <img src={`http://localhost:3000/uploads/${guitar.images[0]}`} alt={guitar.name} className="w-20 h-20 object-cover rounded shadow" />
+                      <img 
+                        src={`http://localhost:5000/uploads/${guitar.images[0]}`} 
+                        alt={guitar.name} 
+                        className="w-20 h-20 object-cover rounded shadow"
+                        onError={(e) => {
+                          console.error("Image failed to load:", e.target.src);
+                          e.target.style.display = 'none';
+                          e.target.nextSibling.style.display = 'inline';
+                        }}
+                      />
                     ) : (
                       <span className="text-gray-400">No Image</span>
                     )}

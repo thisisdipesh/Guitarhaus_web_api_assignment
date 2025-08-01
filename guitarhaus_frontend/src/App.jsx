@@ -60,6 +60,11 @@ function App() {
   const publicRoutes = [
     {
       path: "/",
+      element: <Suspense fallback={<LoadingFallback />}><Login /></Suspense>,
+      errorElement: <ErrorFallback />,
+    },
+    {
+      path: "/home",
       element: <Suspense fallback={<LoadingFallback />}><Home /></Suspense>,
       errorElement: <ErrorFallback />,
     },

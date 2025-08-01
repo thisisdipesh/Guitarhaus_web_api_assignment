@@ -34,7 +34,7 @@ const Checkout = () => {
       try {
         if (id) {
           // Single guitar checkout
-          const res = await axios.get(`http://localhost:3000/api/v1/guitars/${id}`);
+          const res = await axios.get(`/api/v1/guitars/${id}`);
           setPackageData(res.data.data);
           setIsCartCheckout(false);
         } else {
@@ -45,7 +45,7 @@ const Checkout = () => {
             return;
           }
 
-          const cartRes = await axios.get(`http://localhost:3000/api/v1/cart`, {
+          const cartRes = await axios.get(`/api/v1/cart`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           
@@ -69,7 +69,7 @@ const Checkout = () => {
   // Get the guitar image from backend or fallback to local images
   const getGuitarImage = (guitar) => {
     if (guitar?.images && guitar.images.length > 0) {
-      return `http://localhost:3000/uploads/${guitar.images[0]}`;
+      return `http://localhost:5000/uploads/${guitar.images[0]}`;
     }
     return guitarImages[Math.floor(Math.random() * guitarImages.length)];
   };

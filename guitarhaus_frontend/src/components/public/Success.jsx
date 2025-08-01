@@ -63,7 +63,7 @@ const Success = () => {
   const handleStripeSuccess = async (sessionId) => {
     try {
       // First, verify the payment with Stripe
-      const stripeResponse = await axios.get(`http://localhost:3000/api/v1/guitars/stripe-session/${sessionId}`);
+      const stripeResponse = await axios.get(`/api/v1/guitars/stripe-session/${sessionId}`);
       
       if (stripeResponse.data.status === 'paid') {
         setStatus('Paid');
@@ -143,7 +143,7 @@ const Success = () => {
       // Create order via API with timeout
       console.log('Making API call to create order...');
       const orderResponse = await Promise.race([
-        axios.post('http://localhost:3000/api/v1/orders/create-from-stripe', orderData),
+        axios.post('/api/v1/orders/create-from-stripe', orderData),
         new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Order creation timeout')), 10000)
         )

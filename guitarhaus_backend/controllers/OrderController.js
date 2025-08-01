@@ -297,6 +297,24 @@ exports.createOrderFromStripe = asyncHandler(async (req, res, next) => {
       }
     }
 
+    // Find or create customer first
+    let customer = await Customer.findOne({ email: customerInfo.email });
+    
+    if (!customer) {
+      console.log('Creating new customer for:', customerInfo.email);
+      customer = await Customer.create({
+        fname: customerInfo.name.split(' ')[0] || customerInfo.name,
+        lname: customerInfo.name.split(' ').slice(1).join(' ') || '',
+        email: customerInfo.email,
+        phone: customerInfo.phone || '0',
+        password: 'temp_password_' + Math.random().toString(36).substr(2, 9), // Generate random password
+        role: "customer"
+      });
+      console.log('✅ New customer created:', customer._id);
+    } else {
+      console.log('✅ Existing customer found:', customer._id);
+    }
+
     // Additional check: Look for recent orders with same customer, amount, and time
     const recentTime = new Date(Date.now() - 5 * 60 * 1000); // 5 minutes ago
     const duplicateOrder = await Order.findOne({
@@ -331,23 +349,7 @@ exports.createOrderFromStripe = asyncHandler(async (req, res, next) => {
       });
     }
 
-    // Find or create customer
-    let customer = await Customer.findOne({ email: customerInfo.email });
-    
-    if (!customer) {
-      console.log('Creating new customer for:', customerInfo.email);
-      customer = await Customer.create({
-        fname: customerInfo.name.split(' ')[0] || customerInfo.name,
-        lname: customerInfo.name.split(' ').slice(1).join(' ') || '',
-        email: customerInfo.email,
-        phone: customerInfo.phone || '0',
-        password: 'temp_password_' + Math.random().toString(36).substr(2, 9), // Generate random password
-        role: "customer"
-      });
-      console.log('✅ New customer created:', customer._id);
-    } else {
-      console.log('✅ Existing customer found:', customer._id);
-    }
+
 
     // Find guitars by name (case-insensitive)
     const guitarNames = items.map(item => item.name);

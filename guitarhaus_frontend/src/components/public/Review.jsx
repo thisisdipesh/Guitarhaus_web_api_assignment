@@ -9,21 +9,58 @@ const Review = () => {
   const [guitars, setGuitars] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [newReview, setNewReview] = useState({
     guitarId: "",
     rating: 5,
     comment: "",
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
 
   // Fetch reviews and guitars on component mount
   useEffect(() => {
     fetchReviews();
     fetchGuitars();
+    checkAuthStatus();
   }, []);
+
+  const checkAuthStatus = async () => {
+    const token = localStorage.getItem("token");
+    const fname = localStorage.getItem("fname");
+    
+    console.log("Auth check - Token:", token ? "Present" : "Missing");
+    console.log("Auth check - Fname:", fname || "Missing");
+    
+    // If token exists, validate it by making a test API call
+    if (token) {
+      try {
+        // Test the token by making a simple API call
+        await axios.get('/api/v1/reviews', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        // If we get here, token is valid
+        setIsLoggedIn(true);
+        setUserInfo({ fname: fname || "User" });
+        console.log("Token validation successful");
+      } catch (error) {
+        console.log("Token validation failed:", error.response?.status);
+        // Token is invalid, clear it
+        localStorage.removeItem("token");
+        localStorage.removeItem("fname");
+        setIsLoggedIn(false);
+        setUserInfo(null);
+      }
+    } else {
+      setIsLoggedIn(false);
+      setUserInfo(null);
+    }
+  };
 
   const fetchReviews = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/reviews");
+      const response = await axios.get("/api/v1/reviews");
       setReviews(response.data.data || []);
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -33,7 +70,7 @@ const Review = () => {
 
   const fetchGuitars = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/api/v1/guitars");
+      const response = await axios.get("/api/v1/guitars");
       setGuitars(response.data.data || []);
     } catch (error) {
       console.error("Error fetching guitars:", error);
@@ -45,6 +82,10 @@ const Review = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Clear previous messages
+    setError("");
+    setSuccess("");
+    
     if (!newReview.guitarId || !newReview.comment) {
       setError("Please select a guitar and write a comment");
       return;
@@ -52,15 +93,23 @@ const Review = () => {
 
     try {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (!token || !isLoggedIn) {
         setError("Please login to submit a review");
         return;
       }
 
-      await axios.post(
-        `http://localhost:3000/api/v1/reviews/guitar/${newReview.guitarId}`,
+      console.log("Submitting review with data:", {
+        guitarId: newReview.guitarId,
+        rating: newReview.rating,
+        comment: newReview.comment,
+        token: token ? "Present" : "Missing"
+      });
+
+      const response = await axios.post(
+        `/api/v1/reviews/guitar/${newReview.guitarId}`,
         {
           rating: newReview.rating,
+          title: "Review",
           comment: newReview.comment,
         },
         {
@@ -68,13 +117,30 @@ const Review = () => {
         }
       );
 
+      console.log("Review submission successful:", response.data);
+
       // Reset form and refresh reviews
       setNewReview({ guitarId: "", rating: 5, comment: "" });
       fetchReviews();
       setError("");
+      setSuccess("Review submitted successfully!");
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(""), 3000);
     } catch (error) {
       console.error("Error submitting review:", error);
-      setError(error.response?.data?.message || "Failed to submit review");
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      
+      if (error.response?.status === 401) {
+        setError("Please login to submit a review");
+      } else if (error.response?.status === 400) {
+        setError(error.response.data.message || "You have already reviewed this guitar");
+      } else if (error.response?.status === 404) {
+        setError("Guitar not found");
+      } else {
+        setError(error.response?.data?.message || "Failed to submit review. Please try again.");
+      }
     }
   };
 
@@ -119,6 +185,12 @@ const Review = () => {
             <p className="text-red-600">{error}</p>
           </div>
         )}
+        
+        {success && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+            <p className="text-green-600">{success}</p>
+          </div>
+        )}
 
         {/* Reviews Grid */}
         {reviews.length === 0 ? (
@@ -160,6 +232,21 @@ const Review = () => {
         {/* Review Form */}
         <div className="bg-white p-6 rounded-lg shadow-md border border-gray-200">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Leave a Review</h2>
+          
+
+          
+          {!isLoggedIn ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">Please log in to submit a review</p>
+              <button
+                type="button"
+                onClick={() => window.location.href = '/login'}
+                className="bg-yellow-500 text-white py-2 px-6 rounded-md hover:bg-yellow-600 transition duration-300 font-semibold"
+              >
+                Login
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-gray-800 font-semibold mb-2">Select Guitar</label>
@@ -220,6 +307,7 @@ const Review = () => {
               Submit Review
             </button>
           </form>
+          )}
         </div>
       </div>
       <Footer />

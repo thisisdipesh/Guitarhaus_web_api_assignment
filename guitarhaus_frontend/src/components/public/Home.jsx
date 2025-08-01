@@ -23,8 +23,12 @@ const Home = () => {
   // Fetch guitars
   useEffect(() => {
     axios
-      .get("http://localhost:3000/api/v1/guitars")
-      .then((res) => setGuitars(res.data.data))
+      .get("/api/v1/guitars")
+      .then((res) => {
+        console.log("API Response:", res.data);
+        console.log("Guitars data:", res.data.data);
+        setGuitars(res.data.data);
+      })
       .catch((err) => console.error("Error fetching guitars:", err));
   }, []);
 
@@ -47,9 +51,16 @@ const Home = () => {
           Explore Our Guitars
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {guitars.slice(0, 3).map((guitar) => (
-            <GuitarCard key={guitar._id} guitarData={guitar} />
-          ))}
+          {console.log("Rendering guitars:", guitars)}
+          {guitars && guitars.length > 0 ? (
+            guitars.slice(0, 3).map((guitar) => (
+              <GuitarCard key={guitar._id} guitarData={guitar} />
+            ))
+          ) : (
+            <div className="col-span-3 text-center py-10">
+              <p className="text-gray-500">Loading guitars...</p>
+            </div>
+          )}
         </div>
       </div>
 

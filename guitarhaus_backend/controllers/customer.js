@@ -191,6 +191,9 @@ const sendTokenResponse = (customer, statusCode, res) => {
             success: true,
             token,
             userId: customer._id,
-            role: customer.role, // Include role in response
+            role: customer.role,
+            fname: customer.fname,
+            lname: customer.lname,
+            email: customer.email,
         });
 };

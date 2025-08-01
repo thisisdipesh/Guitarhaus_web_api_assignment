@@ -51,8 +51,9 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="absolute top-5 left-5">
-        <Link to="/">
+      {/* Logo */}
+      <div className="absolute top-5 left-5 z-10">
+        <Link to="/home">
           <img
             src={guitarHausLogo}
             alt="Guitar Haus Logo"
@@ -60,12 +61,14 @@ const Register = () => {
           />
         </Link>
       </div>
-      <div className="relative flex w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
-        {/* Left: Guitar Poster Image */}
-        <div className="w-1/4 md:w-1/3 lg:w-1/4 bg-gray-50 flex items-center justify-center">
+      
+      {/* Main Container - Split Layout */}
+      <div className="relative flex w-full max-w-6xl bg-white shadow-2xl rounded-lg overflow-hidden">
+        {/* Left: Full Image Side */}
+        <div className="w-1/2 bg-gray-50 flex items-center justify-center relative">
           <img
             src={loginpageImage}
-            alt="GuitarHaus Poster"
+            alt="GuitarHaus Background"
             className="w-full h-full object-cover"
             onLoad={() => console.log("Image loaded successfully")}
             onError={(e) => {
@@ -74,9 +77,12 @@ const Register = () => {
               e.target.style.display = 'none';
             }}
           />
+          {/* Optional overlay for better text contrast if needed */}
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
         </div>
-        {/* Right: Register Form */}
-        <div className="w-3/4 md:w-2/3 lg:w-3/4 p-6 md:p-8 flex flex-col justify-center">
+        
+        {/* Right: Register Form Side */}
+        <div className="w-1/2 p-8 md:p-12 flex flex-col justify-center">
           <div className="flex flex-col items-center mb-4 md:mb-6">
             <FaGuitar className="text-2xl md:text-3xl text-gray-700 mb-2" />
             <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-1">
@@ -93,7 +99,7 @@ const Register = () => {
             </p>
           </div>
 
-          <form onSubmit={handleRegister} className="space-y-3 md:space-y-4">
+          <form onSubmit={handleRegister} className="space-y-4 md:space-y-6">
             <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4">
               <div className="w-full md:w-1/2">
                 <label

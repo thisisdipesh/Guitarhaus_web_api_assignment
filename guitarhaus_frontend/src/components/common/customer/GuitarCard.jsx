@@ -10,9 +10,11 @@ import guitar5 from '/src/assets/images/guitar5.jpg';
 const guitarImages = [guitar1, guitar2, guitar3, guitar4, guitar5];
 
 const GuitarCard = ({ guitarData }) => {
+  console.log("GuitarCard received data:", guitarData);
+  
   // Use the uploaded image if available, otherwise use a random local image
   const imageSrc = guitarData.images && guitarData.images.length > 0
-    ? `http://localhost:3000/uploads/${guitarData.images[0]}`
+    ? `http://localhost:5000/uploads/${guitarData.images[0]}`
     : guitarImages[Math.floor(Math.random() * guitarImages.length)];
 
   return (

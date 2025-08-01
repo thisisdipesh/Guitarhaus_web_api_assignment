@@ -19,7 +19,7 @@ const Favorite = () => {
     const fetchFavorites = async () => {
       try {
         const token = localStorage.getItem("token"); 
-        const response = await axios.get("http://localhost:3000/api/v1/wishlist", {
+        const response = await axios.get("/api/v1/wishlist", {
           headers: { Authorization: `Bearer ${token}` },
         });
         // response.data.data is an array of wishlist items, each with a 'guitar' property
@@ -40,7 +40,7 @@ const Favorite = () => {
   const removeFavorite = async (guitarId) => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:3000/api/v1/wishlist/remove/${guitarId}`, {
+      await axios.delete(`/api/v1/wishlist/remove/${guitarId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFavorites((prevFavorites) => prevFavorites.filter((item) => item.guitar && item.guitar._id !== guitarId));
@@ -64,7 +64,7 @@ const Favorite = () => {
           <div className="flex flex-col gap-6">
             {favorites.map((item) => item.guitar && (
               <div key={item.guitar._id} className="bg-white shadow-lg rounded-lg flex items-center p-4">
-                <img src={item.guitar.images && item.guitar.images.length > 0 ? `http://localhost:3000/uploads/${item.guitar.images[0]}` : guitarImages[Math.floor(Math.random() * guitarImages.length)]} alt="Guitar for sale" className="w-32 h-32 object-cover rounded-md" />
+                <img src={item.guitar.images && item.guitar.images.length > 0 ? `http://localhost:5000/uploads/${item.guitar.images[0]}` : guitarImages[Math.floor(Math.random() * guitarImages.length)]} alt="Guitar for sale" className="w-32 h-32 object-cover rounded-md" />
                 <div className="ml-6 flex-grow">
                   <h3 className="text-2xl font-bold text-gray-800">{item.guitar.name || item.guitar.title}</h3>
                   <p className="text-gray-800 mt-1">{item.guitar.description}</p>
