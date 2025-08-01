@@ -17,7 +17,7 @@ const Cancel = () => {
             Browse Guitars
           </Link>
           <Link 
-            to="/" 
+            to="/home" 
             className="bg-gray-600 text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-gray-700 transition"
           >
             Return Home

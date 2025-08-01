@@ -229,7 +229,7 @@ const Success = () => {
           </div>
         )}
         <Link 
-          to="/" 
+          to="/home" 
           className="bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg shadow-lg hover:bg-green-700 hover:shadow-xl transition duration-200 transform hover:scale-105 border-2 border-green-600 hover:border-green-700"
         >
           Return Home
